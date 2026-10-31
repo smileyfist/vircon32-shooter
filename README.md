@@ -1,6 +1,6 @@
 # vircon32-shooter
 
-A small Vircon32 top-down shooter called Shooter McShoots.
+A small Vircon32 top-down shooter called Shooty McShoots.
 
 ## Current prototype
 
@@ -16,9 +16,13 @@ A small Vircon32 top-down shooter called Shooter McShoots.
 
 The player uses the transparent sprite in `images\player.png`, a 128 x 128
 nearest-neighbor version of `images\playerShipNew.png`. Separate banked sprites
-raise one wing and lower the other while keeping the nose pointed up. The title,
-HUD, and projectiles use the Vircon32 BIOS font. Enemies use a red, swept-wing
-alien ship with a blue canopy, inspired by the supplied reference image.
+raise one wing and lower the other while keeping the nose pointed up. The
+640 x 360 title screen uses `images\title.png`; the HUD and projectiles use the
+Vircon32 BIOS font. Enemies use a red, swept-wing alien ship with a blue canopy,
+inspired by the supplied reference image.
+The game background is a slowly scrolling, vertically repeating starfield from
+`images\background1.png`, prepared as a seamless tile in
+`images\space-background.png`.
 
 ## Source layout
 
@@ -31,8 +35,9 @@ with separate `game`, `states`, and `utils` folders:
 - `src/states/` contains the title and game-over screens.
 - `src/utils/` contains shared constants and drawing helpers.
 - `images/` contains the original ship art, the 128 x 128 player sprite, and
-  left- and right-banked sprites, plus the red alien enemy ship. All game
-  sprites are converted to Vircon32 textures during the build.
+  left- and right-banked sprites, the red alien enemy ship, and title artwork.
+  It also contains the original and scroll-ready space backgrounds. All game
+  images are converted to Vircon32 textures during the build.
 
 Vircon32's C compiler accepts one source file per invocation, so `src/main.c`
 includes the module `.c` files to build them together as one program.
@@ -83,8 +88,8 @@ binary, then packages it using `shooter.xml`. Intermediate files go in `obj\`,
 and the playable cartridge is written to:
 
 ```text
-bin\shooter-mc-shoots.v32
+bin\shooty-mc-shoots.v32
 ```
 
-Open the Vircon32 emulator and load `bin\shooter-mc-shoots.v32` to play. Run
+Open the Vircon32 emulator and load `bin\shooty-mc-shoots.v32` to play. Run
 `.\Make.bat` again after changing the source to rebuild the cartridge.

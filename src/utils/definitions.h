@@ -10,4 +10,7 @@
 #define ARENA_MIN_Y  3
 #define ARENA_MAX_Y  15
 
+#define SCREEN_WIDTH  640
+#define SCREEN_HEIGHT  360
+
 #endif

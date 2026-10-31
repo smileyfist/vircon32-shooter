@@ -3,12 +3,10 @@
 
 void menu_draw()
 {
-    set_multiply_color( make_color_rgb( 60, 220, 255 ) );
-    print_at( 240, 110, "SHOOTER MCSHOOTS" );
-
-    set_multiply_color( make_color_rgb( 255, 220, 90 ) );
-    print_at( 280, 220, "[ PLAY ]" );
-
+    select_texture( 4 );
+    select_region( 0 );
+    define_region_center( 0, 0, 640, 360 );
+    set_drawing_scale( 1, 1 );
     set_multiply_color( color_white );
-    print_at( 210, 265, "PRESS ANY BUTTON" );
+    draw_region_zoomed_at( 320, 180 );
 }

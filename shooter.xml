@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <rom-definition version="1.0">
-    <rom type="cartridge" title="Shooter McShoots" version="0.1" />
+    <rom type="cartridge" title="Shooty McShoots" version="0.1" />
     <binary path="obj/main.vbin" />
     <textures>
         <texture path="obj/player.vtex" />
         <texture path="obj/player-bank-left.vtex" />
         <texture path="obj/player-bank-right.vtex" />
         <texture path="obj/enemy-alien.vtex" />
+        <texture path="obj/title.vtex" />
+        <texture path="obj/space-background.vtex" />
     </textures>
     <sounds />
 </rom-definition>

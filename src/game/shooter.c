@@ -267,10 +267,23 @@ void shooter_update()
 
 void shooter_draw()
 {
+    int background_scroll = (game.frame / 8) % SCREEN_HEIGHT;
+
+    select_texture( 5 );
+    select_region( 0 );
+    define_region_center( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
+    set_drawing_scale( 1, 1 );
+    set_multiply_color( color_white );
+    draw_region_zoomed_at( SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + background_scroll );
+    draw_region_zoomed_at(
+        SCREEN_WIDTH / 2,
+        SCREEN_HEIGHT / 2 + background_scroll - SCREEN_HEIGHT
+    );
+
     draw_arena_frame( (game.frame / 4) % 40 );
 
     set_multiply_color( color_white );
-    print_at( 12, 8, "SHOOTER" );
+    print_at( 12, 8, "SHOOTY" );
     print_at( 170, 8, "WAVE" );
     draw_number( 220, 8, game.wave, 2 );
     print_at( 280, 8, "SCORE" );

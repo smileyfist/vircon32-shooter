@@ -16,16 +16,20 @@ png2vircon images\player-bank-right.png -o obj\player-bank-right.vtex
 if errorlevel 1 goto failed
 png2vircon images\enemy-alien.png -o obj\enemy-alien.vtex
 if errorlevel 1 goto failed
+png2vircon images\title.png -o obj\title.vtex
+if errorlevel 1 goto failed
+png2vircon images\space-background.png -o obj\space-background.vtex
+if errorlevel 1 goto failed
 
 echo Assemble the code
 assemble obj\main.asm -o obj\main.vbin
 if errorlevel 1 goto failed
 
 echo Package the ROM
-packrom shooter.xml -o bin\shooter-mc-shoots.v32
+packrom shooter.xml -o bin\shooty-mc-shoots.v32
 if errorlevel 1 goto failed
 
-echo Build successful: bin\shooter-mc-shoots.v32
+echo Build successful: bin\shooty-mc-shoots.v32
 exit /b 0
 
 :failed

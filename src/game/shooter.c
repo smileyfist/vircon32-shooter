@@ -7,6 +7,7 @@
 
 #define MAX_BULLETS  12
 #define MAX_ENEMIES  5
+#define MAX_EXPLOSIONS  12
 #define MAX_HEALTH  20
 #define PLAYER_MOVE_INTERVAL  2
 #define PLAYER_SPRITE_SIZE  128
@@ -15,6 +16,17 @@
 #define ENEMY_DRAW_SIZE_PIXELS  38
 #define ENEMY_SPAWN_Y  -2
 #define LASER_SPRITE_SIZE  32
+#define EXPLOSION_FRAME_SIZE  32
+#define EXPLOSION_FRAME_COUNT  4
+#define EXPLOSION_FRAME_DURATION  3
+
+struct shooter_explosion
+{
+    int x;
+    int y;
+    int frame;
+    int active;
+};
 
 struct shooter_bullet
 {
@@ -51,9 +63,41 @@ struct shooter_game
     int game_over;
     shooter_bullet[ MAX_BULLETS ] bullets;
     shooter_enemy[ MAX_ENEMIES ] enemies;
+    shooter_explosion[ MAX_EXPLOSIONS ] explosions;
 };
 
 shooter_game game;
+
+void shooter_spawn_explosion( int x, int y )
+{
+    for( int slot = 0; slot < MAX_EXPLOSIONS; ++slot )
+    {
+        shooter_explosion* explosion = &game.explosions[ slot ];
+        if( !explosion->active )
+        {
+            explosion->x = x;
+            explosion->y = y;
+            explosion->frame = 0;
+            explosion->active = true;
+            return;
+        }
+    }
+}
+
+void shooter_update_explosions()
+{
+    for( int slot = 0; slot < MAX_EXPLOSIONS; ++slot )
+    {
+        shooter_explosion* explosion = &game.explosions[ slot ];
+        if( !explosion->active )
+          continue;
+
+        ++explosion->frame;
+        if( explosion->frame >=
+            EXPLOSION_FRAME_COUNT * EXPLOSION_FRAME_DURATION )
+          explosion->active = false;
+    }
+}
 
 void shooter_spawn_enemy( int slot )
 {
@@ -105,6 +149,8 @@ void shooter_start()
 
     for( int slot = 0; slot < MAX_BULLETS; ++slot )
       game.bullets[ slot ].active = false;
+    for( int slot = 0; slot < MAX_EXPLOSIONS; ++slot )
+      game.explosions[ slot ].active = false;
 
     shooter_begin_wave();
 }
@@ -191,6 +237,7 @@ void shooter_update_bullets()
             if( enemy->active && bullet->x == enemy->x &&
                 bullet->y >= enemy_y - 1 && bullet->y <= enemy_y + 1 )
             {
+                shooter_spawn_explosion( enemy->x * 10 + 5, enemy_y * 10 + 10 );
                 enemy->active = false;
                 bullet->active = false;
                 game.score += 100;
@@ -255,6 +302,8 @@ void shooter_update()
       --game.enemy_cooldown;
     if( game.invulnerability > 0 )
       --game.invulnerability;
+
+    shooter_update_explosions();
 
     if( game.move_cooldown == 0 )
       shooter_move_player();
@@ -323,6 +372,27 @@ void shooter_draw()
           );
     }
     set_drawing_scale( 1, 1 );
+
+    select_texture( 10 );
+    select_region( 0 );
+    set_drawing_scale( 1, 1 );
+    set_multiply_color( color_white );
+    for( int slot = 0; slot < MAX_EXPLOSIONS; ++slot )
+    {
+        shooter_explosion* explosion = &game.explosions[ slot ];
+        if( explosion->active )
+        {
+            int frame = explosion->frame / EXPLOSION_FRAME_DURATION;
+            int frame_x = frame * EXPLOSION_FRAME_SIZE;
+            define_region_center(
+                frame_x,
+                0,
+                frame_x + EXPLOSION_FRAME_SIZE,
+                EXPLOSION_FRAME_SIZE
+            );
+            draw_region_zoomed_at( explosion->x, explosion->y );
+        }
+    }
 
     select_texture( 8 );
     select_region( 0 );

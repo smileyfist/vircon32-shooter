@@ -14,11 +14,16 @@
 #define BANKED_SPRITE_SIZE  160
 #define ENEMY_SPRITE_SIZE  128
 #define ENEMY_DRAW_SIZE_PIXELS  38
+#define ENEMY_HITBOX_HALF_SIZE  16
 #define ENEMY_SPAWN_Y  -2
 #define LASER_SPRITE_SIZE  32
+#define LASER_HITBOX_HALF_WIDTH  8
+#define LASER_HITBOX_HALF_HEIGHT  16
 #define EXPLOSION_FRAME_SIZE  32
 #define EXPLOSION_FRAME_COUNT  4
 #define EXPLOSION_FRAME_DURATION  3
+#define PLAYER_HITBOX_HALF_WIDTH  14
+#define PLAYER_HITBOX_HALF_HEIGHT  20
 
 struct shooter_explosion
 {
@@ -212,6 +217,23 @@ void shooter_fire()
     }
 }
 
+int shooter_boxes_overlap(
+    int first_x,
+    int first_y,
+    int first_half_width,
+    int first_half_height,
+    int second_x,
+    int second_y,
+    int second_half_width,
+    int second_half_height
+)
+{
+    return first_x - first_half_width <= second_x + second_half_width &&
+        first_x + first_half_width >= second_x - second_half_width &&
+        first_y - first_half_height <= second_y + second_half_height &&
+        first_y + first_half_height >= second_y - second_half_height;
+}
+
 void shooter_update_bullets()
 {
     for( int bullet_slot = 0; bullet_slot < MAX_BULLETS; ++bullet_slot )
@@ -220,11 +242,11 @@ void shooter_update_bullets()
         if( !bullet->active )
           continue;
 
+        int previous_y = bullet->y;
         bullet->x += bullet->dx;
         bullet->y += bullet->dy;
 
-        if( bullet->x < ARENA_MIN_X + 1 || bullet->x > ARENA_MAX_X - 1 ||
-            bullet->y < PLAYER_MIN_Y || bullet->y > PLAYER_MAX_Y )
+        if( bullet->x < ARENA_MIN_X + 1 || bullet->x > ARENA_MAX_X - 1 )
         {
             bullet->active = false;
             continue;
@@ -233,11 +255,30 @@ void shooter_update_bullets()
         for( int enemy_slot = 0; enemy_slot < MAX_ENEMIES; ++enemy_slot )
         {
             shooter_enemy* enemy = &game.enemies[ enemy_slot ];
-            int enemy_y = enemy->y * 2;
-            if( enemy->active && bullet->x == enemy->x &&
-                bullet->y >= enemy_y - 1 && bullet->y <= enemy_y + 1 )
+            int bullet_x = bullet->x * 10 + 5;
+            int bullet_start_y = previous_y * PLAYER_Y_STEP_PIXELS + 5;
+            int bullet_end_y = bullet->y * PLAYER_Y_STEP_PIXELS + 5;
+            int bullet_min_y = bullet_start_y;
+            int bullet_max_y = bullet_end_y;
+            if( bullet_min_y > bullet_max_y )
             {
-                shooter_spawn_explosion( enemy->x * 10 + 5, enemy_y * 10 + 10 );
+                bullet_min_y = bullet_end_y;
+                bullet_max_y = bullet_start_y;
+            }
+
+            int enemy_x = enemy->x * 10 + 5;
+            int enemy_y = enemy->y * 20 + 10;
+            if( enemy->active &&
+                bullet_x - LASER_HITBOX_HALF_WIDTH <=
+                  enemy_x + ENEMY_HITBOX_HALF_SIZE &&
+                bullet_x + LASER_HITBOX_HALF_WIDTH >=
+                  enemy_x - ENEMY_HITBOX_HALF_SIZE &&
+                bullet_min_y - LASER_HITBOX_HALF_HEIGHT <=
+                  enemy_y + ENEMY_HITBOX_HALF_SIZE &&
+                bullet_max_y + LASER_HITBOX_HALF_HEIGHT >=
+                  enemy_y - ENEMY_HITBOX_HALF_SIZE )
+            {
+                shooter_spawn_explosion( enemy_x, enemy_y );
                 enemy->active = false;
                 bullet->active = false;
                 game.score += 100;
@@ -245,6 +286,53 @@ void shooter_update_bullets()
                 shooter_fill_enemy_slots();
                 break;
             }
+        }
+
+        if( bullet->y * PLAYER_Y_STEP_PIXELS + 5 +
+            LASER_HITBOX_HALF_HEIGHT < 0 )
+          bullet->active = false;
+    }
+
+    if( game.wave_kills >= game.wave_total )
+      shooter_begin_wave();
+}
+
+void shooter_check_player_collisions()
+{
+    int player_x = game.player_x * 10 + 5;
+    int player_y = game.player_y * PLAYER_Y_STEP_PIXELS + 10;
+
+    for( int slot = 0; slot < MAX_ENEMIES; ++slot )
+    {
+        shooter_enemy* enemy = &game.enemies[ slot ];
+        if( !enemy->active )
+          continue;
+
+        int enemy_x = enemy->x * 10 + 5;
+        int enemy_y = enemy->y * 20 + 10;
+        if( shooter_boxes_overlap(
+              player_x,
+              player_y,
+              PLAYER_HITBOX_HALF_WIDTH,
+              PLAYER_HITBOX_HALF_HEIGHT,
+              enemy_x,
+              enemy_y,
+              ENEMY_HITBOX_HALF_SIZE,
+              ENEMY_HITBOX_HALF_SIZE
+            ) )
+        {
+            if( game.invulnerability == 0 )
+            {
+                --game.health;
+                game.invulnerability = 45;
+
+                if( game.health <= 0 )
+                  game.game_over = true;
+            }
+
+            enemy->active = false;
+            ++game.wave_kills;
+            shooter_fill_enemy_slots();
         }
     }
 
@@ -262,25 +350,8 @@ void shooter_move_enemies()
 
         ++enemy->y;
 
-        int enemy_y = enemy->y * 2;
-        if( enemy_y >= game.player_y - 4 && enemy_y <= game.player_y + 2 &&
-            enemy->x > game.player_x - 2 && enemy->x < game.player_x + 2 )
-        {
-            if( game.invulnerability == 0 )
-            {
-                --game.health;
-                game.invulnerability = 45;
-
-                if( game.health <= 0 )
-                  game.game_over = true;
-            }
-
-            enemy->active = false;
-            ++game.wave_kills;
-            shooter_fill_enemy_slots();
-        }
-        else if( enemy->y * 20 + 10 - ENEMY_DRAW_SIZE_PIXELS / 2 >=
-                 SCREEN_HEIGHT )
+        if( enemy->y * 20 + 10 - ENEMY_DRAW_SIZE_PIXELS / 2 >=
+            SCREEN_HEIGHT )
         {
             enemy->active = false;
             ++game.wave_kills;
@@ -319,6 +390,8 @@ void shooter_update()
         shooter_move_enemies();
         game.enemy_cooldown = 8;
     }
+
+    shooter_check_player_collisions();
 
     ++game.frame;
 }

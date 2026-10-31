@@ -19,8 +19,8 @@
 #define ENEMY_HITBOX_HALF_SIZE  16
 #define ENEMY_SPAWN_Y  -4
 #define LASER_SPRITE_SIZE  32
-#define LASER_HITBOX_HALF_WIDTH  8
-#define LASER_HITBOX_HALF_HEIGHT  16
+#define LASER_HITBOX_HALF_WIDTH  4
+#define LASER_HITBOX_HALF_HEIGHT  8
 #define EXPLOSION_FRAME_SIZE  32
 #define EXPLOSION_FRAME_COUNT  4
 #define EXPLOSION_FRAME_DURATION  3
@@ -323,6 +323,8 @@ void shooter_check_player_collisions()
               ENEMY_HITBOX_HALF_SIZE
             ) )
         {
+            shooter_spawn_explosion( enemy_x, enemy_y );
+
             if( game.invulnerability == 0 )
             {
                 --game.health;
@@ -473,7 +475,7 @@ void shooter_draw()
     select_texture( 8 );
     select_region( 0 );
     define_region_center( 0, 0, LASER_SPRITE_SIZE, LASER_SPRITE_SIZE * 2 );
-    set_drawing_scale( 0.5, 0.5 );
+    set_drawing_scale( 0.25, 0.25 );
     set_multiply_color( color_white );
     for( int slot = 0; slot < MAX_BULLETS; ++slot )
     {

@@ -7,7 +7,7 @@
 
 #define MAX_BULLETS  12
 #define MAX_ENEMIES  5
-#define MAX_HEALTH  10
+#define MAX_HEALTH  20
 #define PLAYER_SPRITE_SIZE  128
 #define BANKED_SPRITE_SIZE  160
 #define ENEMY_SPRITE_SIZE  128
@@ -283,14 +283,23 @@ void shooter_draw()
 
     draw_arena_frame( (game.frame / 4) % 40 );
 
+    select_texture( 7 );
+    select_region( 0 );
+    define_region_center( 0, 0, 16, SCREEN_HEIGHT );
+    set_multiply_color( color_white );
+    draw_region_zoomed_at( SCREEN_WIDTH - 8, SCREEN_HEIGHT / 2 );
+
     select_texture( 6 );
     select_region( 0 );
     define_region_center( 0, 0, 16, 24 );
+    set_multiply_color( color_white );
+    set_drawing_scale( 1, 0.5 );
     for( int segment = 0; segment < game.health; ++segment )
       draw_region_zoomed_at(
-          SCREEN_WIDTH - 18,
-          30 + (MAX_HEALTH - game.health + segment) * 30
+          SCREEN_WIDTH - 8,
+          10 + (MAX_HEALTH - game.health + segment) * 17
       );
+    set_drawing_scale( 1, 1 );
 
     select_texture( 3 );
     select_region( 0 );

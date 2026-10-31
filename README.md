@@ -11,7 +11,7 @@ A small Vircon32 top-down shooter called Shooty McShoots.
   points; clearing a wave increases the next wave's size.
 - Earn points by hitting enemies. The game ends when your hull reaches zero.
 - Remaining hull is shown as a vertical, bright-green segmented bar on the
-  right side of the screen.
+  far right over a black backing, with up to 20 segments.
 - Select **PLAY** with **Enter** or any face button at the title screen. After
   the game-over screen's two-second lockout, press any button to return to the
   title screen.

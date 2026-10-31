@@ -22,6 +22,8 @@ png2vircon images\space-background.png -o obj\space-background.vtex
 if errorlevel 1 goto failed
 png2vircon images\health-segment.png -o obj\health-segment.vtex
 if errorlevel 1 goto failed
+png2vircon images\health-background.png -o obj\health-background.vtex
+if errorlevel 1 goto failed
 
 echo Assemble the code
 assemble obj\main.asm -o obj\main.vbin

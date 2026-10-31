@@ -36,12 +36,6 @@ void draw_arena_frame( int scroll_offset )
     horizontal_border[ 63 ] = 0;
 
     set_multiply_color( make_color_rgb( 40, 90, 110 ) );
-    for( int y = 40; y <= 320; y += 20 )
-    {
-        print_at( 10, y, "|" );
-        print_at( 620, y, "|" );
-    }
-
     for( int y = 40 + scroll_offset; y < 320; y += 40 )
       print_at( 310, y, ":" );
 }

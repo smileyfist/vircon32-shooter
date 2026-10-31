@@ -10,6 +10,7 @@
         <texture path="obj/title.vtex" />
         <texture path="obj/space-background.vtex" />
         <texture path="obj/health-segment.vtex" />
+        <texture path="obj/health-background.vtex" />
     </textures>
     <sounds />
 </rom-definition>

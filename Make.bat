@@ -1,20 +1,21 @@
 @echo off
+cd /d "%~dp0"
 if not exist obj mkdir obj
 if not exist bin mkdir bin
 
 echo Compile the C code
-compile hello-world.c -o obj\hello-world.asm
+compile src\main.c -o obj\main.asm
 if errorlevel 1 goto failed
 
 echo Assemble the code
-assemble obj\hello-world.asm -o obj\hello-world.vbin
+assemble obj\main.asm -o obj\main.vbin
 if errorlevel 1 goto failed
 
 echo Package the ROM
-packrom hello-world.xml -o bin\hello-world.v32
+packrom shooter.xml -o bin\neon-dusk.v32
 if errorlevel 1 goto failed
 
-echo Build successful: bin\hello-world.v32
+echo Build successful: bin\neon-dusk.v32
 exit /b 0
 
 :failed

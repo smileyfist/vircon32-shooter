@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no" ?>
 <rom-definition version="1.0">
-    <rom type="cartridge" title="Hello World" version="1.0" />
-    <binary path="obj/hello-world.vbin" />
+    <rom type="cartridge" title="Neon Dusk" version="0.1" />
+    <binary path="obj/main.vbin" />
     <textures />
     <sounds />
 </rom-definition>

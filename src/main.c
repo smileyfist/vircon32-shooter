@@ -15,6 +15,8 @@
 void main( void )
 {
     int current_state = STATE_MENU;
+    int menu_input_delay_frames = frames_per_second;
+    int game_over_lockout_frames = 0;
 
     while( true )
     {
@@ -22,9 +24,20 @@ void main( void )
 
         if( current_state == STATE_MENU )
         {
+            int menu_button_pressed =
+                gamepad_button_start() ||
+                gamepad_button_a() ||
+                gamepad_button_b() ||
+                gamepad_button_x() ||
+                gamepad_button_y() ||
+                gamepad_button_l() ||
+                gamepad_button_r();
+
             menu_draw();
 
-            if( gamepad_button_start() || gamepad_button_a() )
+            if( menu_input_delay_frames > 0 )
+              --menu_input_delay_frames;
+            else if( menu_button_pressed )
             {
                 shooter_start();
                 current_state = STATE_PLAYING;
@@ -36,14 +49,34 @@ void main( void )
             shooter_draw();
 
             if( shooter_is_game_over() )
+            {
               current_state = STATE_GAME_OVER;
+              game_over_lockout_frames = 2 * frames_per_second;
+            }
         }
         else
         {
-            gameover_draw( shooter_get_score(), shooter_get_wave() );
+            if( game_over_lockout_frames > 0 )
+              --game_over_lockout_frames;
 
-            if( gamepad_button_start() || gamepad_button_a() )
-              current_state = STATE_MENU;
+            gameover_draw(
+                shooter_get_score(),
+                shooter_get_wave(),
+                game_over_lockout_frames == 0
+            );
+
+            if( game_over_lockout_frames == 0 &&
+                (gamepad_button_start() ||
+                 gamepad_button_a() ||
+                 gamepad_button_b() ||
+                 gamepad_button_x() ||
+                 gamepad_button_y() ||
+                 gamepad_button_l() ||
+                 gamepad_button_r()) )
+            {
+                menu_input_delay_frames = frames_per_second;
+                current_state = STATE_MENU;
+            }
         }
 
         end_frame();

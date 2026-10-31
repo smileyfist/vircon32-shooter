@@ -1,23 +1,24 @@
 # vircon32-shooter
 
-A small Vircon32 top-down shooter prototype called Neon Dusk.
+A small Vircon32 top-down shooter called Shooter McShoots.
 
 ## Current prototype
 
-- Move left and right with the directional keys. The player stays near the
-  bottom of the scrolling playfield and always faces upward.
+- Move around the playfield with the directional keys. The ship banks when
+  moving left or right and always faces upward.
 - Fire upward with **Z**. Enemies enter from the top and descend toward you.
 - Survive waves of enemies. Each collision costs one of your three hull
   points; clearing a wave increases the next wave's size.
 - Earn points by hitting enemies. The game ends when your hull reaches zero.
-- Press **Enter** or **X** at the title screen to start. After game over, press
-  either again to return to the title screen.
+- Select **PLAY** with **Enter** or any face button at the title screen. After
+  the game-over screen's two-second lockout, press any button to return to the
+  title screen.
 
 The player uses the transparent sprite in `images\player.png`, a 128 x 128
 nearest-neighbor version of `images\playerShipNew.png`. Separate banked sprites
 raise one wing and lower the other while keeping the nose pointed up. The title,
-HUD, enemies, and projectiles use the Vircon32 BIOS font, so no other art or
-audio assets are required.
+HUD, and projectiles use the Vircon32 BIOS font. Enemies use a red, swept-wing
+alien ship with a blue canopy, inspired by the supplied reference image.
 
 ## Source layout
 
@@ -30,8 +31,8 @@ with separate `game`, `states`, and `utils` folders:
 - `src/states/` contains the title and game-over screens.
 - `src/utils/` contains shared constants and drawing helpers.
 - `images/` contains the original ship art, the 128 x 128 player sprite, and
-  left- and right-banked sprites, converted to Vircon32 textures during the
-  build.
+  left- and right-banked sprites, plus the red alien enemy ship. All game
+  sprites are converted to Vircon32 textures during the build.
 
 Vircon32's C compiler accepts one source file per invocation, so `src/main.c`
 includes the module `.c` files to build them together as one program.
@@ -82,8 +83,8 @@ binary, then packages it using `shooter.xml`. Intermediate files go in `obj\`,
 and the playable cartridge is written to:
 
 ```text
-bin\neon-dusk.v32
+bin\shooter-mc-shoots.v32
 ```
 
-Open the Vircon32 emulator and load `bin\neon-dusk.v32` to play. Run
+Open the Vircon32 emulator and load `bin\shooter-mc-shoots.v32` to play. Run
 `.\Make.bat` again after changing the source to rebuild the cartridge.

@@ -9,6 +9,7 @@
 #define MAX_ENEMIES  5
 #define PLAYER_SPRITE_SIZE  128
 #define BANKED_SPRITE_SIZE  160
+#define ENEMY_SPRITE_SIZE  128
 
 struct shooter_bullet
 {
@@ -106,27 +107,39 @@ void shooter_start()
 void shooter_move_player()
 {
     int delta_x = 0;
+    int delta_y = 0;
 
     if( gamepad_left() > 0 )
       delta_x = -1;
     else if( gamepad_right() > 0 )
       delta_x = 1;
 
-    if( delta_x == 0 )
+    if( gamepad_up() > 0 )
+      delta_y = -1;
+    else if( gamepad_down() > 0 )
+      delta_y = 1;
+
+    if( delta_x == 0 && delta_y == 0 )
     {
         game.player_bank = 0;
-      return;
+        return;
     }
 
     int next_x = game.player_x + delta_x;
+    int next_y = game.player_y + delta_y;
 
-    if( next_x >= ARENA_MIN_X + 3 && next_x <= ARENA_MAX_X - 3 )
+    if( delta_x != 0 &&
+        next_x >= ARENA_MIN_X + 3 && next_x <= ARENA_MAX_X - 3 )
     {
-      game.player_x = next_x;
-      game.player_bank = delta_x;
+        game.player_x = next_x;
+        game.player_bank = delta_x;
     }
-    else
-      game.player_bank = 0;
+    else if( delta_x != 0 )
+        game.player_bank = 0;
+
+    if( delta_y != 0 &&
+        next_y >= ARENA_MIN_Y + 1 && next_y <= ARENA_MAX_Y - 1 )
+      game.player_y = next_y;
 
     game.move_cooldown = 4;
 }
@@ -257,7 +270,7 @@ void shooter_draw()
     draw_arena_frame( (game.frame / 4) % 40 );
 
     set_multiply_color( color_white );
-    print_at( 12, 8, "NEON DUSK" );
+    print_at( 12, 8, "SHOOTER" );
     print_at( 170, 8, "WAVE" );
     draw_number( 220, 8, game.wave, 2 );
     print_at( 280, 8, "SCORE" );
@@ -265,12 +278,21 @@ void shooter_draw()
     print_at( 485, 8, "HULL" );
     draw_number( 535, 8, game.health, 1 );
 
-    set_multiply_color( make_color_rgb( 255, 75, 85 ) );
+    select_texture( 3 );
+    select_region( 0 );
+    define_region_center( 0, 0, ENEMY_SPRITE_SIZE, ENEMY_SPRITE_SIZE );
+    set_drawing_scale( 0.3, 0.3 );
+    set_multiply_color( color_white );
+
     for( int slot = 0; slot < MAX_ENEMIES; ++slot )
     {
         if( game.enemies[ slot ].active )
-          print_at( game.enemies[ slot ].x * 10, game.enemies[ slot ].y * 20, "o" );
+          draw_region_zoomed_at(
+              game.enemies[ slot ].x * 10 + 5,
+              game.enemies[ slot ].y * 20 + 10
+          );
     }
+    set_drawing_scale( 1, 1 );
 
     set_multiply_color( make_color_rgb( 255, 220, 90 ) );
     for( int slot = 0; slot < MAX_BULLETS; ++slot )

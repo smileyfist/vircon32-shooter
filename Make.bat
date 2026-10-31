@@ -14,16 +14,18 @@ png2vircon images\player-bank-left.png -o obj\player-bank-left.vtex
 if errorlevel 1 goto failed
 png2vircon images\player-bank-right.png -o obj\player-bank-right.vtex
 if errorlevel 1 goto failed
+png2vircon images\enemy-alien.png -o obj\enemy-alien.vtex
+if errorlevel 1 goto failed
 
 echo Assemble the code
 assemble obj\main.asm -o obj\main.vbin
 if errorlevel 1 goto failed
 
 echo Package the ROM
-packrom shooter.xml -o bin\neon-dusk.v32
+packrom shooter.xml -o bin\shooter-mc-shoots.v32
 if errorlevel 1 goto failed
 
-echo Build successful: bin\neon-dusk.v32
+echo Build successful: bin\shooter-mc-shoots.v32
 exit /b 0
 
 :failed

@@ -23,9 +23,12 @@
 #define ENEMY_DRAW_SIZE_PIXELS  38
 #define ENEMY_HITBOX_HALF_SIZE  16
 #define ENEMY_SPAWN_Y  -4
-#define LASER_SPRITE_SIZE  32
-#define LASER_HITBOX_HALF_WIDTH  4
-#define LASER_HITBOX_HALF_HEIGHT  8
+#define LASER_TEXTURE_LEFT  6
+#define LASER_TEXTURE_TOP  1
+#define LASER_SPRITE_WIDTH  21
+#define LASER_SPRITE_HEIGHT  46
+#define LASER_HITBOX_HALF_WIDTH  3
+#define LASER_HITBOX_HALF_HEIGHT  6
 #define EXPLOSION_FRAME_SIZE  32
 #define EXPLOSION_FRAME_COUNT  4
 #define EXPLOSION_FRAME_DURATION  3
@@ -426,7 +429,7 @@ void shooter_check_player_collisions()
             if( game.invulnerability == 0 )
             {
                 --game.health;
-                game.invulnerability = 45;
+                game.invulnerability = 15;
 
                 if( game.health <= 0 )
                   game.game_over = true;
@@ -589,7 +592,12 @@ void shooter_draw()
 
     select_texture( 8 );
     select_region( 0 );
-    define_region_center( 0, 0, LASER_SPRITE_SIZE, LASER_SPRITE_SIZE * 2 );
+    define_region_center(
+        LASER_TEXTURE_LEFT,
+        LASER_TEXTURE_TOP,
+        LASER_TEXTURE_LEFT + LASER_SPRITE_WIDTH,
+        LASER_TEXTURE_TOP + LASER_SPRITE_HEIGHT
+    );
     set_drawing_scale( 0.25, 0.25 );
     set_multiply_color( color_white );
     for( int slot = 0; slot < MAX_BULLETS; ++slot )
@@ -602,36 +610,36 @@ void shooter_draw()
     }
     set_drawing_scale( 1, 1 );
 
-    if( game.invulnerability == 0 || game.frame % 6 < 3 )
+    int texture_id = 0;
+    int sprite_size = PLAYER_SPRITE_SIZE;
+    float sprite_scale = 0.4375;
+
+    if( game.player_bank < 0 )
     {
-        int texture_id = 0;
-        int sprite_size = PLAYER_SPRITE_SIZE;
-        float sprite_scale = 0.4375;
-
-        if( game.player_bank < 0 )
-        {
-            texture_id = 1;
-            sprite_size = BANKED_SPRITE_SIZE;
-            sprite_scale = 0.4375;
-        }
-        else if( game.player_bank > 0 )
-        {
-            texture_id = 2;
-            sprite_size = BANKED_SPRITE_SIZE;
-            sprite_scale = 0.4375;
-        }
-
-        select_texture( texture_id );
-        select_region( 0 );
-        define_region_center( 0, 0, sprite_size, sprite_size );
-        set_drawing_scale( sprite_scale, sprite_scale );
-        set_multiply_color( color_white );
-        draw_region_zoomed_at(
-            game.player_x * 10 + 5,
-            game.player_y * PLAYER_Y_STEP_PIXELS + 10
-        );
-        set_drawing_scale( 1, 1 );
+        texture_id = 1;
+        sprite_size = BANKED_SPRITE_SIZE;
+        sprite_scale = 0.4375;
     }
+    else if( game.player_bank > 0 )
+    {
+        texture_id = 2;
+        sprite_size = BANKED_SPRITE_SIZE;
+        sprite_scale = 0.4375;
+    }
+
+    select_texture( texture_id );
+    select_region( 0 );
+    define_region_center( 0, 0, sprite_size, sprite_size );
+    set_drawing_scale( sprite_scale, sprite_scale );
+    if( game.invulnerability > 0 )
+      set_multiply_color( color_red );
+    else
+      set_multiply_color( color_white );
+    draw_region_zoomed_at(
+        game.player_x * 10 + 5,
+        game.player_y * PLAYER_Y_STEP_PIXELS + 10
+    );
+    set_drawing_scale( 1, 1 );
 
     select_texture( 11 );
     select_region( 0 );

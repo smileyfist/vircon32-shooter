@@ -289,8 +289,6 @@ void shooter_draw()
         SCREEN_HEIGHT / 2 + background_scroll - SCREEN_HEIGHT
     );
 
-    draw_arena_frame( (game.frame / 4) % 40 );
-
     select_texture( 7 );
     select_region( 0 );
     define_region_center( 0, 0, 16, SCREEN_HEIGHT );

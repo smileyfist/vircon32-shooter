@@ -24,18 +24,3 @@ void draw_number( int drawing_x, int drawing_y, int value, int digits )
     text[ digits ] = 0;
     print_at( drawing_x, drawing_y, text );
 }
-
-void draw_arena_frame( int scroll_offset )
-{
-    int[ 64 ] horizontal_border;
-
-    horizontal_border[ 0 ] = '+';
-    for( int position = 1; position < 62; ++position )
-      horizontal_border[ position ] = '-';
-    horizontal_border[ 62 ] = '+';
-    horizontal_border[ 63 ] = 0;
-
-    set_multiply_color( make_color_rgb( 40, 90, 110 ) );
-    for( int y = 40 + scroll_offset; y < 320; y += 40 )
-      print_at( 310, y, ":" );
-}

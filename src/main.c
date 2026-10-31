@@ -59,11 +59,7 @@ void main( void )
             if( game_over_lockout_frames > 0 )
               --game_over_lockout_frames;
 
-            gameover_draw(
-                shooter_get_score(),
-                shooter_get_wave(),
-                game_over_lockout_frames == 0
-            );
+            gameover_draw();
 
             if( game_over_lockout_frames == 0 &&
                 (gamepad_button_start() ||

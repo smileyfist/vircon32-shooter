@@ -8,6 +8,7 @@
 #define MAX_BULLETS  12
 #define MAX_ENEMIES  5
 #define MAX_HEALTH  20
+#define PLAYER_MOVE_INTERVAL  2
 #define PLAYER_SPRITE_SIZE  128
 #define BANKED_SPRITE_SIZE  160
 #define ENEMY_SPRITE_SIZE  128
@@ -87,7 +88,7 @@ void shooter_begin_wave()
 void shooter_start()
 {
     game.player_x = 32;
-    game.player_y = ARENA_MAX_Y - 1;
+    game.player_y = (ARENA_MAX_Y - 1) * 2;
     game.player_bank = 0;
     game.move_cooldown = 0;
     game.fire_cooldown = 0;
@@ -130,7 +131,7 @@ void shooter_move_player()
     int next_y = game.player_y + delta_y;
 
     if( delta_x != 0 &&
-        next_x >= ARENA_MIN_X + 3 && next_x <= ARENA_MAX_X - 3 )
+        next_x >= PLAYER_MIN_X && next_x <= PLAYER_MAX_X )
     {
         game.player_x = next_x;
         game.player_bank = delta_x;
@@ -139,10 +140,10 @@ void shooter_move_player()
         game.player_bank = 0;
 
     if( delta_y != 0 &&
-        next_y >= ARENA_MIN_Y + 1 && next_y <= ARENA_MAX_Y - 1 )
+        next_y >= PLAYER_MIN_Y && next_y <= PLAYER_MAX_Y )
       game.player_y = next_y;
 
-    game.move_cooldown = 4;
+    game.move_cooldown = PLAYER_MOVE_INTERVAL;
 }
 
 void shooter_fire()
@@ -154,7 +155,7 @@ void shooter_fire()
             game.bullets[ slot ].x = game.player_x;
             game.bullets[ slot ].y = game.player_y;
             game.bullets[ slot ].dx = 0;
-            game.bullets[ slot ].dy = -1;
+            game.bullets[ slot ].dy = -2;
             game.bullets[ slot ].active = true;
             game.fire_cooldown = 8;
             return;
@@ -174,7 +175,7 @@ void shooter_update_bullets()
         bullet->y += bullet->dy;
 
         if( bullet->x < ARENA_MIN_X + 1 || bullet->x > ARENA_MAX_X - 1 ||
-            bullet->y < ARENA_MIN_Y || bullet->y > ARENA_MAX_Y )
+            bullet->y < PLAYER_MIN_Y || bullet->y > PLAYER_MAX_Y )
         {
             bullet->active = false;
             continue;
@@ -183,7 +184,9 @@ void shooter_update_bullets()
         for( int enemy_slot = 0; enemy_slot < MAX_ENEMIES; ++enemy_slot )
         {
             shooter_enemy* enemy = &game.enemies[ enemy_slot ];
-            if( enemy->active && bullet->x == enemy->x && bullet->y == enemy->y )
+            int enemy_y = enemy->y * 2;
+            if( enemy->active && bullet->x == enemy->x &&
+                bullet->y >= enemy_y - 1 && bullet->y <= enemy_y + 1 )
             {
                 enemy->active = false;
                 bullet->active = false;
@@ -209,7 +212,8 @@ void shooter_move_enemies()
 
         ++enemy->y;
 
-        if( enemy->y >= game.player_y - 2 && enemy->y <= game.player_y + 1 &&
+        int enemy_y = enemy->y * 2;
+        if( enemy_y >= game.player_y - 4 && enemy_y <= game.player_y + 2 &&
             enemy->x > game.player_x - 2 && enemy->x < game.player_x + 2 )
         {
             if( game.invulnerability == 0 )
@@ -287,6 +291,7 @@ void shooter_draw()
     select_region( 0 );
     define_region_center( 0, 0, 16, SCREEN_HEIGHT );
     set_multiply_color( color_white );
+    draw_region_zoomed_at( 8, SCREEN_HEIGHT / 2 );
     draw_region_zoomed_at( SCREEN_WIDTH - 8, SCREEN_HEIGHT / 2 );
 
     select_texture( 6 );
@@ -321,7 +326,11 @@ void shooter_draw()
     for( int slot = 0; slot < MAX_BULLETS; ++slot )
     {
         if( game.bullets[ slot ].active )
-          print_at( game.bullets[ slot ].x * 10, game.bullets[ slot ].y * 20, "*" );
+          print_at(
+              game.bullets[ slot ].x * 10,
+              game.bullets[ slot ].y * PLAYER_Y_STEP_PIXELS,
+              "*"
+          );
     }
 
     if( game.invulnerability == 0 || game.frame % 6 < 3 )
@@ -348,7 +357,10 @@ void shooter_draw()
         define_region_center( 0, 0, sprite_size, sprite_size );
         set_drawing_scale( sprite_scale, sprite_scale );
         set_multiply_color( color_white );
-        draw_region_zoomed_at( game.player_x * 10 + 5, game.player_y * 20 + 10 );
+        draw_region_zoomed_at(
+            game.player_x * 10 + 5,
+            game.player_y * PLAYER_Y_STEP_PIXELS + 10
+        );
         set_drawing_scale( 1, 1 );
     }
 }

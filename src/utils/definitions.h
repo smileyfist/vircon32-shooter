@@ -10,6 +10,12 @@
 #define ARENA_MIN_Y  3
 #define ARENA_MAX_Y  15
 
+#define PLAYER_MIN_Y  1
+#define PLAYER_MAX_Y  32
+#define PLAYER_Y_STEP_PIXELS  10
+#define PLAYER_MIN_X  3
+#define PLAYER_MAX_X  60
+
 #define SCREEN_WIDTH  640
 #define SCREEN_HEIGHT  360
 

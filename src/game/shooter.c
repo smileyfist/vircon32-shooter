@@ -537,6 +537,15 @@ void shooter_draw()
           SCREEN_WIDTH - 8,
           10 + (MAX_HEALTH - game.health + segment) * 17
       );
+    if( game.invulnerability > 0 )
+    {
+        set_multiply_color( color_red );
+        draw_region_zoomed_at(
+            SCREEN_WIDTH - 8,
+            10 + (MAX_HEALTH - game.health - 1) * 17
+        );
+        set_multiply_color( color_white );
+    }
     set_drawing_scale( 1, 1 );
 
     select_texture( 3 );

@@ -10,12 +10,14 @@
 #define MAX_EXPLOSIONS  12
 #define MAX_HEALTH  20
 #define PLAYER_MOVE_INTERVAL  2
+#define ENEMY_MOVE_INTERVAL  PLAYER_MOVE_INTERVAL
 #define PLAYER_SPRITE_SIZE  128
 #define BANKED_SPRITE_SIZE  160
 #define ENEMY_SPRITE_SIZE  128
+#define ENEMY_Y_STEP_PIXELS  PLAYER_Y_STEP_PIXELS
 #define ENEMY_DRAW_SIZE_PIXELS  38
 #define ENEMY_HITBOX_HALF_SIZE  16
-#define ENEMY_SPAWN_Y  -2
+#define ENEMY_SPAWN_Y  -4
 #define LASER_SPRITE_SIZE  32
 #define LASER_HITBOX_HALF_WIDTH  8
 #define LASER_HITBOX_HALF_HEIGHT  16
@@ -267,7 +269,7 @@ void shooter_update_bullets()
             }
 
             int enemy_x = enemy->x * 10 + 5;
-            int enemy_y = enemy->y * 20 + 10;
+            int enemy_y = enemy->y * ENEMY_Y_STEP_PIXELS + 10;
             if( enemy->active &&
                 bullet_x - LASER_HITBOX_HALF_WIDTH <=
                   enemy_x + ENEMY_HITBOX_HALF_SIZE &&
@@ -309,7 +311,7 @@ void shooter_check_player_collisions()
           continue;
 
         int enemy_x = enemy->x * 10 + 5;
-        int enemy_y = enemy->y * 20 + 10;
+        int enemy_y = enemy->y * ENEMY_Y_STEP_PIXELS + 10;
         if( shooter_boxes_overlap(
               player_x,
               player_y,
@@ -350,7 +352,8 @@ void shooter_move_enemies()
 
         ++enemy->y;
 
-        if( enemy->y * 20 + 10 - ENEMY_DRAW_SIZE_PIXELS / 2 >=
+        if( enemy->y * ENEMY_Y_STEP_PIXELS + 10 -
+            ENEMY_DRAW_SIZE_PIXELS / 2 >=
             SCREEN_HEIGHT )
         {
             enemy->active = false;
@@ -388,7 +391,7 @@ void shooter_update()
     if( game.enemy_cooldown == 0 )
     {
         shooter_move_enemies();
-        game.enemy_cooldown = 8;
+        game.enemy_cooldown = ENEMY_MOVE_INTERVAL;
     }
 
     shooter_check_player_collisions();
@@ -441,7 +444,7 @@ void shooter_draw()
         if( game.enemies[ slot ].active )
           draw_region_zoomed_at(
               game.enemies[ slot ].x * 10 + 5,
-              game.enemies[ slot ].y * 20 + 10
+              game.enemies[ slot ].y * ENEMY_Y_STEP_PIXELS + 10
           );
     }
     set_drawing_scale( 1, 1 );

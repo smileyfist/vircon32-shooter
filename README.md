@@ -12,6 +12,8 @@ A small Vircon32 top-down shooter called Shooty McShoots.
 - Survive waves of enemies. Each collision costs one of your three hull
   points; clearing a wave increases the next wave's size.
 - Earn points by hitting enemies. The game ends when your hull reaches zero.
+- Occasionally, destroyed enemy ships drop a gold coin. Collect it by flying
+  into it; your coin total appears at the bottom-left of the playfield.
 - Remaining hull is shown as a vertical, bright-green segmented bar on the
   far right over a black backing, with up to 20 segments.
 - Enemy ships burst into a brief pixel-art explosion when hit.
@@ -43,9 +45,9 @@ with separate `game`, `states`, and `utils` folders:
 - `src/utils/` contains shared constants and drawing helpers.
 - `images/` contains the original ship art, the 128 x 128 player sprite, and
   left- and right-banked sprites, the red alien enemy ship, title artwork,
-  health-bar segment, laser sprite, explosion animation, title and game-over
-  artwork, and original and scroll-ready space backgrounds. All game images
-  are converted to Vircon32 textures during the build.
+  health-bar segment, laser sprite, explosion animation, coin pickup, title
+  and game-over artwork, and original and scroll-ready space backgrounds. All
+  game images are converted to Vircon32 textures during the build.
 
 Vircon32's C compiler accepts one source file per invocation, so `src/main.c`
 includes the module `.c` files to build them together as one program.

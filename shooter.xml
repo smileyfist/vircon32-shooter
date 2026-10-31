@@ -14,6 +14,7 @@
         <texture path="obj/laser-blast.vtex" />
         <texture path="obj/game-over-screen.vtex" />
         <texture path="obj/explosion.vtex" />
+        <texture path="obj/coin.vtex" />
     </textures>
     <sounds />
 </rom-definition>

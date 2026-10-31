@@ -8,7 +8,12 @@
 #define MAX_BULLETS  24
 #define MAX_ENEMIES  5
 #define MAX_EXPLOSIONS  12
+#define MAX_COINS  8
 #define MAX_HEALTH  20
+#define COIN_DROP_CHANCE  4
+#define COIN_SPRITE_SIZE  16
+#define COIN_HITBOX_HALF_SIZE  8
+#define BACKGROUND_SCROLL_INTERVAL  8
 #define PLAYER_MOVE_INTERVAL  2
 #define ENEMY_MOVE_INTERVAL  PLAYER_MOVE_INTERVAL
 #define PLAYER_SPRITE_SIZE  128
@@ -51,6 +56,13 @@ struct shooter_enemy
     int active;
 };
 
+struct shooter_coin
+{
+    int x;
+    int y_pixels;
+    int active;
+};
+
 struct shooter_game
 {
     int player_x;
@@ -62,6 +74,8 @@ struct shooter_game
     int invulnerability;
     int frame;
     int score;
+    int coins_collected;
+    int coin_random;
     int health;
     int wave;
     int wave_total;
@@ -71,6 +85,7 @@ struct shooter_game
     shooter_bullet[ MAX_BULLETS ] bullets;
     shooter_enemy[ MAX_ENEMIES ] enemies;
     shooter_explosion[ MAX_EXPLOSIONS ] explosions;
+    shooter_coin[ MAX_COINS ] coins;
 };
 
 shooter_game game;
@@ -86,6 +101,26 @@ void shooter_spawn_explosion( int x, int y )
             explosion->y = y;
             explosion->frame = 0;
             explosion->active = true;
+            return;
+        }
+    }
+}
+
+void shooter_maybe_drop_coin( int x, int y )
+{
+    game.coin_random =
+        (game.coin_random * 25173 + 13849) % 65521;
+    if( game.coin_random % COIN_DROP_CHANCE != 0 )
+      return;
+
+    for( int slot = 0; slot < MAX_COINS; ++slot )
+    {
+        shooter_coin* coin = &game.coins[ slot ];
+        if( !coin->active )
+        {
+            coin->x = x;
+            coin->y_pixels = y * PLAYER_Y_STEP_PIXELS + 10;
+            coin->active = true;
             return;
         }
     }
@@ -150,6 +185,8 @@ void shooter_start()
     game.invulnerability = 0;
     game.frame = 0;
     game.score = 0;
+    game.coins_collected = 0;
+    game.coin_random = 1;
     game.health = MAX_HEALTH;
     game.wave = 0;
     game.game_over = false;
@@ -158,6 +195,8 @@ void shooter_start()
       game.bullets[ slot ].active = false;
     for( int slot = 0; slot < MAX_EXPLOSIONS; ++slot )
       game.explosions[ slot ].active = false;
+    for( int slot = 0; slot < MAX_COINS; ++slot )
+      game.coins[ slot ].active = false;
 
     shooter_begin_wave();
 }
@@ -259,6 +298,41 @@ int shooter_boxes_overlap(
         first_y + first_half_height >= second_y - second_half_height;
 }
 
+void shooter_update_coins()
+{
+    int player_x = game.player_x * 10 + 5;
+    int player_y = game.player_y * PLAYER_Y_STEP_PIXELS + 10;
+
+    for( int slot = 0; slot < MAX_COINS; ++slot )
+    {
+        shooter_coin* coin = &game.coins[ slot ];
+        if( !coin->active )
+          continue;
+
+        if( (game.frame + 1) % BACKGROUND_SCROLL_INTERVAL == 0 )
+          ++coin->y_pixels;
+
+        int coin_x = coin->x * 10 + 5;
+        int coin_y = coin->y_pixels;
+        if( shooter_boxes_overlap(
+              player_x,
+              player_y,
+              PLAYER_HITBOX_HALF_WIDTH,
+              PLAYER_HITBOX_HALF_HEIGHT,
+              coin_x,
+              coin_y,
+              COIN_HITBOX_HALF_SIZE,
+              COIN_HITBOX_HALF_SIZE
+            ) )
+        {
+            coin->active = false;
+            ++game.coins_collected;
+        }
+        else if( coin_y - COIN_HITBOX_HALF_SIZE >= SCREEN_HEIGHT )
+          coin->active = false;
+    }
+}
+
 void shooter_update_bullets()
 {
     for( int bullet_slot = 0; bullet_slot < MAX_BULLETS; ++bullet_slot )
@@ -304,6 +378,7 @@ void shooter_update_bullets()
                   enemy_y - ENEMY_HITBOX_HALF_SIZE )
             {
                 shooter_spawn_explosion( enemy_x, enemy_y );
+                shooter_maybe_drop_coin( enemy->x, enemy->y );
                 enemy->active = false;
                 bullet->active = false;
                 game.score += 100;
@@ -413,6 +488,8 @@ void shooter_update()
     if( game.frame % 3 == 0 )
       shooter_update_bullets();
 
+    shooter_update_coins();
+
     if( game.enemy_cooldown == 0 )
     {
         shooter_move_enemies();
@@ -426,7 +503,8 @@ void shooter_update()
 
 void shooter_draw()
 {
-    int background_scroll = (game.frame / 8) % SCREEN_HEIGHT;
+    int background_scroll =
+        (game.frame / BACKGROUND_SCROLL_INTERVAL) % SCREEN_HEIGHT;
 
     select_texture( 5 );
     select_region( 0 );
@@ -495,6 +573,20 @@ void shooter_draw()
         }
     }
 
+    select_texture( 11 );
+    select_region( 0 );
+    define_region_center( 0, 0, COIN_SPRITE_SIZE, COIN_SPRITE_SIZE );
+    set_drawing_scale( 1, 1 );
+    set_multiply_color( color_white );
+    for( int slot = 0; slot < MAX_COINS; ++slot )
+    {
+        if( game.coins[ slot ].active )
+          draw_region_zoomed_at(
+              game.coins[ slot ].x * 10 + 5,
+              game.coins[ slot ].y_pixels
+          );
+    }
+
     select_texture( 8 );
     select_region( 0 );
     define_region_center( 0, 0, LASER_SPRITE_SIZE, LASER_SPRITE_SIZE * 2 );
@@ -540,6 +632,21 @@ void shooter_draw()
         );
         set_drawing_scale( 1, 1 );
     }
+
+    select_texture( 11 );
+    select_region( 0 );
+    define_region_center( 0, 0, COIN_SPRITE_SIZE, COIN_SPRITE_SIZE );
+    set_drawing_scale( 1, 1 );
+    set_multiply_color( color_white );
+    draw_region_zoomed_at( 16, SCREEN_HEIGHT - 16 );
+    int coin_digits = 1;
+    int coin_value = game.coins_collected;
+    while( coin_value >= 10 && coin_digits < 6 )
+    {
+        coin_value /= 10;
+        ++coin_digits;
+    }
+    draw_number( 30, SCREEN_HEIGHT - 26, game.coins_collected, coin_digits );
 }
 
 int shooter_is_game_over()

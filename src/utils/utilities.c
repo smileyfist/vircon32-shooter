@@ -27,7 +27,7 @@ void draw_number( int drawing_x, int drawing_y, int value, int digits )
 
 void draw_arena_frame()
 {
-    int[ 63 ] horizontal_border;
+    int[ 64 ] horizontal_border;
 
     horizontal_border[ 0 ] = '+';
     for( int position = 1; position < 62; ++position )

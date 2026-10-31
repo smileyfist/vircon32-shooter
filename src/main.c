@@ -12,32 +12,46 @@
 #include "states/menu.c"
 #include "states/gameover.c"
 
+int read_gamepad_buttons()
+{
+    int buttons = 0;
+    if( gamepad_button_start() > 0 )
+      buttons |= 1;
+    if( gamepad_button_a() > 0 )
+      buttons |= 2;
+    if( gamepad_button_b() > 0 )
+      buttons |= 4;
+    if( gamepad_button_x() > 0 )
+      buttons |= 8;
+    if( gamepad_button_y() > 0 )
+      buttons |= 16;
+    if( gamepad_button_l() > 0 )
+      buttons |= 32;
+    if( gamepad_button_r() > 0 )
+      buttons |= 64;
+
+    return buttons;
+}
+
 void main( void )
 {
     int current_state = STATE_MENU;
     int menu_input_delay_frames = frames_per_second;
     int game_over_lockout_frames = 0;
+    int previous_gamepad_buttons = 0;
 
     while( true )
     {
         clear_screen( color_black );
+        int gamepad_buttons = read_gamepad_buttons();
 
         if( current_state == STATE_MENU )
         {
-            int menu_button_pressed =
-                gamepad_button_start() ||
-                gamepad_button_a() ||
-                gamepad_button_b() ||
-                gamepad_button_x() ||
-                gamepad_button_y() ||
-                gamepad_button_l() ||
-                gamepad_button_r();
-
             menu_draw();
 
             if( menu_input_delay_frames > 0 )
               --menu_input_delay_frames;
-            else if( menu_button_pressed )
+            else if( (gamepad_buttons & ~previous_gamepad_buttons) != 0 )
             {
                 shooter_start();
                 current_state = STATE_PLAYING;
@@ -61,20 +75,14 @@ void main( void )
 
             gameover_draw();
 
-            if( game_over_lockout_frames == 0 &&
-                (gamepad_button_start() ||
-                 gamepad_button_a() ||
-                 gamepad_button_b() ||
-                 gamepad_button_x() ||
-                 gamepad_button_y() ||
-                 gamepad_button_l() ||
-                 gamepad_button_r()) )
+            if( game_over_lockout_frames == 0 && gamepad_buttons != 0 )
             {
                 menu_input_delay_frames = frames_per_second;
                 current_state = STATE_MENU;
             }
         }
 
+        previous_gamepad_buttons = gamepad_buttons;
         end_frame();
     }
 }

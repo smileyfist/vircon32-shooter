@@ -5,7 +5,7 @@
 #include "../utils/utilities.h"
 #include "shooter.h"
 
-#define MAX_BULLETS  12
+#define MAX_BULLETS  24
 #define MAX_ENEMIES  5
 #define MAX_EXPLOSIONS  12
 #define MAX_HEALTH  20
@@ -204,19 +204,42 @@ void shooter_move_player()
 
 void shooter_fire()
 {
+    int[ 2 ] bullet_slots;
+    int available_bullets = 0;
+
     for( int slot = 0; slot < MAX_BULLETS; ++slot )
     {
         if( !game.bullets[ slot ].active )
         {
-            game.bullets[ slot ].x = game.player_x;
-            game.bullets[ slot ].y = game.player_y;
-            game.bullets[ slot ].dx = 0;
-            game.bullets[ slot ].dy = -2;
-            game.bullets[ slot ].active = true;
-            game.fire_cooldown = 8;
-            return;
+            bullet_slots[ available_bullets ] = slot;
+            ++available_bullets;
+            if( available_bullets == 2 )
+              break;
         }
     }
+
+    if( available_bullets < 2 )
+      return;
+
+    for( int shot = 0; shot < 2; ++shot )
+    {
+        shooter_bullet* bullet = &game.bullets[ bullet_slots[ shot ] ];
+        bullet->x = game.player_x;
+        if( shot == 0 )
+          --bullet->x;
+        else
+          ++bullet->x;
+        if( bullet->x < ARENA_MIN_X + 1 )
+          bullet->x = ARENA_MIN_X + 1;
+        if( bullet->x > ARENA_MAX_X - 1 )
+          bullet->x = ARENA_MAX_X - 1;
+        bullet->y = game.player_y;
+        bullet->dx = 0;
+        bullet->dy = -2;
+        bullet->active = true;
+    }
+
+    game.fire_cooldown = 8;
 }
 
 int shooter_boxes_overlap(

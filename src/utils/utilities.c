@@ -25,7 +25,7 @@ void draw_number( int drawing_x, int drawing_y, int value, int digits )
     print_at( drawing_x, drawing_y, text );
 }
 
-void draw_arena_frame()
+void draw_arena_frame( int scroll_offset )
 {
     int[ 64 ] horizontal_border;
 
@@ -36,12 +36,12 @@ void draw_arena_frame()
     horizontal_border[ 63 ] = 0;
 
     set_multiply_color( make_color_rgb( 40, 90, 110 ) );
-    print_at( 10, 40, horizontal_border );
-    print_at( 10, 320, horizontal_border );
-
-    for( int row = ARENA_MIN_Y; row <= ARENA_MAX_Y; ++row )
+    for( int y = 40; y <= 320; y += 20 )
     {
-        print_at( 10, row * 20, "|" );
-        print_at( 620, row * 20, "|" );
+        print_at( 10, y, "|" );
+        print_at( 620, y, "|" );
     }
+
+    for( int y = 40 + scroll_offset; y < 320; y += 40 )
+      print_at( 310, y, ":" );
 }

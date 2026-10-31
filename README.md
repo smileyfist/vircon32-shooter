@@ -4,9 +4,10 @@ A small Vircon32 top-down shooter prototype called Neon Dusk.
 
 ## Current prototype
 
-- Move around the arena with the directional keys and fire in the direction
-  you're facing with **Z**.
-- Survive waves of pursuing enemies. Each hit costs one of your three hull
+- Move left and right with the directional keys. The player stays near the
+  bottom of the scrolling playfield and always faces upward.
+- Fire upward with **Z**. Enemies enter from the top and descend toward you.
+- Survive waves of enemies. Each collision costs one of your three hull
   points; clearing a wave increases the next wave's size.
 - Earn points by hitting enemies. The game ends when your hull reaches zero.
 - Press **Enter** or **X** at the title screen to start. After game over, press

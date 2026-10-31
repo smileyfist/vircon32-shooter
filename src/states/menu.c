@@ -10,8 +10,8 @@ void menu_draw()
     print_at( 195, 125, "A TOP-DOWN ARCADE SHOOTER" );
 
     set_multiply_color( color_white );
-    print_at( 170, 190, "ARROWS  MOVE" );
-    print_at( 170, 220, "Z  FIRE IN YOUR FACING DIRECTION" );
+    print_at( 170, 190, "LEFT / RIGHT  MOVE" );
+    print_at( 170, 220, "Z  FIRE UPWARD" );
 
     set_multiply_color( make_color_rgb( 255, 220, 90 ) );
     print_at( 190, 285, "PRESS ENTER OR X TO START" );

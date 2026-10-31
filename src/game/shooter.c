@@ -28,8 +28,6 @@ struct shooter_game
 {
     int player_x;
     int player_y;
-    int facing_x;
-    int facing_y;
     int move_cooldown;
     int fire_cooldown;
     int enemy_cooldown;
@@ -50,30 +48,9 @@ shooter_game game;
 
 void shooter_spawn_enemy( int slot )
 {
-    int edge = (game.wave + slot) % 4;
-    int offset = (slot * 3 + game.wave * 2) % 13;
-
-    if( edge == 0 )
-    {
-        game.enemies[ slot ].x = ARENA_MIN_X + 1;
-        game.enemies[ slot ].y = ARENA_MIN_Y + offset;
-    }
-    else if( edge == 1 )
-    {
-        game.enemies[ slot ].x = ARENA_MAX_X - 1;
-        game.enemies[ slot ].y = ARENA_MIN_Y + offset;
-    }
-    else if( edge == 2 )
-    {
-        game.enemies[ slot ].x = ARENA_MIN_X + 1 + offset * 4;
-        game.enemies[ slot ].y = ARENA_MIN_Y;
-    }
-    else
-    {
-        game.enemies[ slot ].x = ARENA_MIN_X + 1 + offset * 4;
-        game.enemies[ slot ].y = ARENA_MAX_Y;
-    }
-
+    game.enemies[ slot ].x = ARENA_MIN_X + 1 +
+        ((slot * 11 + game.wave * 7) % (ARENA_MAX_X - ARENA_MIN_X - 1));
+    game.enemies[ slot ].y = ARENA_MIN_Y;
     game.enemies[ slot ].active = true;
 }
 
@@ -105,9 +82,7 @@ void shooter_begin_wave()
 void shooter_start()
 {
     game.player_x = 32;
-    game.player_y = 9;
-    game.facing_x = 1;
-    game.facing_y = 0;
+    game.player_y = ARENA_MAX_Y - 1;
     game.move_cooldown = 0;
     game.fire_cooldown = 0;
     game.enemy_cooldown = 0;
@@ -127,32 +102,19 @@ void shooter_start()
 void shooter_move_player()
 {
     int delta_x = 0;
-    int delta_y = 0;
 
     if( gamepad_left() > 0 )
       delta_x = -1;
     else if( gamepad_right() > 0 )
       delta_x = 1;
 
-    if( gamepad_up() > 0 )
-      delta_y = -1;
-    else if( gamepad_down() > 0 )
-      delta_y = 1;
-
-    if( delta_x == 0 && delta_y == 0 )
+    if( delta_x == 0 )
       return;
 
-    game.facing_x = delta_x;
-    game.facing_y = delta_y;
-
     int next_x = game.player_x + delta_x;
-    int next_y = game.player_y + delta_y;
 
     if( next_x >= ARENA_MIN_X + 1 && next_x <= ARENA_MAX_X - 1 )
       game.player_x = next_x;
-
-    if( next_y >= ARENA_MIN_Y && next_y <= ARENA_MAX_Y )
-      game.player_y = next_y;
 
     game.move_cooldown = 4;
 }
@@ -165,8 +127,8 @@ void shooter_fire()
         {
             game.bullets[ slot ].x = game.player_x;
             game.bullets[ slot ].y = game.player_y;
-            game.bullets[ slot ].dx = game.facing_x;
-            game.bullets[ slot ].dy = game.facing_y;
+            game.bullets[ slot ].dx = 0;
+            game.bullets[ slot ].dy = -1;
             game.bullets[ slot ].active = true;
             game.fire_cooldown = 8;
             return;
@@ -219,39 +181,34 @@ void shooter_move_enemies()
         if( !enemy->active )
           continue;
 
-        int distance_x = game.player_x - enemy->x;
-        int distance_y = game.player_y - enemy->y;
+        ++enemy->y;
 
-        if( distance_x < 0 )
-          distance_x = -distance_x;
-        if( distance_y < 0 )
-          distance_y = -distance_y;
-
-        if( distance_x >= distance_y && enemy->x != game.player_x )
+        if( enemy->y >= game.player_y - 2 && enemy->y <= game.player_y + 1 &&
+            enemy->x > game.player_x - 2 && enemy->x < game.player_x + 2 )
         {
-            if( game.player_x > enemy->x )
-              ++enemy->x;
-            else
-              --enemy->x;
+            if( game.invulnerability == 0 )
+            {
+                --game.health;
+                game.invulnerability = 45;
+
+                if( game.health <= 0 )
+                  game.game_over = true;
+            }
+
+            enemy->active = false;
+            ++game.wave_kills;
+            shooter_fill_enemy_slots();
         }
-        else if( enemy->y != game.player_y )
+        else if( enemy->y > ARENA_MAX_Y )
         {
-            if( game.player_y > enemy->y )
-              ++enemy->y;
-            else
-              --enemy->y;
-        }
-
-        if( enemy->x == game.player_x && enemy->y == game.player_y &&
-            game.invulnerability == 0 )
-        {
-            --game.health;
-            game.invulnerability = 45;
-
-            if( game.health <= 0 )
-              game.game_over = true;
+            enemy->active = false;
+            ++game.wave_kills;
+            shooter_fill_enemy_slots();
         }
     }
+
+    if( game.wave_kills >= game.wave_total )
+      shooter_begin_wave();
 }
 
 void shooter_update()
@@ -285,7 +242,7 @@ void shooter_update()
 
 void shooter_draw()
 {
-    draw_arena_frame();
+    draw_arena_frame( (game.frame / 4) % 40 );
 
     set_multiply_color( color_white );
     print_at( 12, 8, "NEON DUSK" );
@@ -312,17 +269,8 @@ void shooter_draw()
 
     if( game.invulnerability == 0 || game.frame % 6 < 3 )
     {
-        int* player_glyph = ">";
-
-        if( game.facing_x < 0 )
-          player_glyph = "<";
-        else if( game.facing_y < 0 )
-          player_glyph = "^";
-        else if( game.facing_y > 0 )
-          player_glyph = "v";
-
         set_multiply_color( make_color_rgb( 60, 220, 255 ) );
-        print_at( game.player_x * 10, game.player_y * 20, player_glyph );
+        print_at( game.player_x * 10, game.player_y * 20, "^" );
     }
 }
 

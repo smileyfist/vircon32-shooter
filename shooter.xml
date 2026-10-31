@@ -4,6 +4,8 @@
     <binary path="obj/main.vbin" />
     <textures>
         <texture path="obj/player.vtex" />
+        <texture path="obj/player-bank-left.vtex" />
+        <texture path="obj/player-bank-right.vtex" />
     </textures>
     <sounds />
 </rom-definition>

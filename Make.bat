@@ -10,6 +10,10 @@ if errorlevel 1 goto failed
 echo Convert the player sprite
 png2vircon images\player.png -o obj\player.vtex
 if errorlevel 1 goto failed
+png2vircon images\player-bank-left.png -o obj\player-bank-left.vtex
+if errorlevel 1 goto failed
+png2vircon images\player-bank-right.png -o obj\player-bank-right.vtex
+if errorlevel 1 goto failed
 
 echo Assemble the code
 assemble obj\main.asm -o obj\main.vbin

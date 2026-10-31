@@ -14,9 +14,10 @@ A small Vircon32 top-down shooter prototype called Neon Dusk.
   either again to return to the title screen.
 
 The player uses the transparent sprite in `images\player.png`, a 128 x 128
-nearest-neighbor version of `images\playerShipNew.png`. The title, HUD, enemies,
-and projectiles use the Vircon32 BIOS font, so no other art or audio assets are
-required.
+nearest-neighbor version of `images\playerShipNew.png`. Separate banked sprites
+raise one wing and lower the other while keeping the nose pointed up. The title,
+HUD, enemies, and projectiles use the Vircon32 BIOS font, so no other art or
+audio assets are required.
 
 ## Source layout
 
@@ -28,8 +29,9 @@ with separate `game`, `states`, and `utils` folders:
 - `src/game/` contains the arena, player, enemy, and projectile logic.
 - `src/states/` contains the title and game-over screens.
 - `src/utils/` contains shared constants and drawing helpers.
-- `images/` contains the original ship art and the 128 x 128 transparent player
-  sprite, converted to a Vircon32 texture during the build.
+- `images/` contains the original ship art, the 128 x 128 player sprite, and
+  left- and right-banked sprites, converted to Vircon32 textures during the
+  build.
 
 Vircon32's C compiler accepts one source file per invocation, so `src/main.c`
 includes the module `.c` files to build them together as one program.

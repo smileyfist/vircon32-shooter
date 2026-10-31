@@ -8,6 +8,7 @@
 #define MAX_BULLETS  12
 #define MAX_ENEMIES  5
 #define PLAYER_SPRITE_SIZE  128
+#define BANKED_SPRITE_SIZE  160
 
 struct shooter_bullet
 {
@@ -29,6 +30,7 @@ struct shooter_game
 {
     int player_x;
     int player_y;
+    int player_bank;
     int move_cooldown;
     int fire_cooldown;
     int enemy_cooldown;
@@ -84,6 +86,7 @@ void shooter_start()
 {
     game.player_x = 32;
     game.player_y = ARENA_MAX_Y - 1;
+    game.player_bank = 0;
     game.move_cooldown = 0;
     game.fire_cooldown = 0;
     game.enemy_cooldown = 0;
@@ -110,12 +113,20 @@ void shooter_move_player()
       delta_x = 1;
 
     if( delta_x == 0 )
+    {
+        game.player_bank = 0;
       return;
+    }
 
     int next_x = game.player_x + delta_x;
 
     if( next_x >= ARENA_MIN_X + 3 && next_x <= ARENA_MAX_X - 3 )
+    {
       game.player_x = next_x;
+      game.player_bank = delta_x;
+    }
+    else
+      game.player_bank = 0;
 
     game.move_cooldown = 4;
 }
@@ -270,10 +281,27 @@ void shooter_draw()
 
     if( game.invulnerability == 0 || game.frame % 6 < 3 )
     {
-        select_texture( 0 );
+        int texture_id = 0;
+        int sprite_size = PLAYER_SPRITE_SIZE;
+        float sprite_scale = 0.4375;
+
+        if( game.player_bank < 0 )
+        {
+            texture_id = 1;
+            sprite_size = BANKED_SPRITE_SIZE;
+            sprite_scale = 0.4375;
+        }
+        else if( game.player_bank > 0 )
+        {
+            texture_id = 2;
+            sprite_size = BANKED_SPRITE_SIZE;
+            sprite_scale = 0.4375;
+        }
+
+        select_texture( texture_id );
         select_region( 0 );
-        define_region_center( 0, 0, PLAYER_SPRITE_SIZE, PLAYER_SPRITE_SIZE );
-        set_drawing_scale( 0.4375, 0.4375 );
+        define_region_center( 0, 0, sprite_size, sprite_size );
+        set_drawing_scale( sprite_scale, sprite_scale );
         set_multiply_color( color_white );
         draw_region_zoomed_at( game.player_x * 10 + 5, game.player_y * 20 + 10 );
         set_drawing_scale( 1, 1 );

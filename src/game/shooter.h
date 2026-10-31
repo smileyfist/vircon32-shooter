@@ -7,5 +7,6 @@ void shooter_draw();
 int shooter_is_game_over();
 int shooter_get_score();
 int shooter_get_wave();
+int shooter_get_coins_collected();
 
 #endif

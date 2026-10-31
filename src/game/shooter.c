@@ -680,3 +680,8 @@ int shooter_get_wave()
 {
     return game.wave;
 }
+
+int shooter_get_coins_collected()
+{
+    return game.coins_collected;
+}

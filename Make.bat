@@ -7,6 +7,10 @@ echo Compile the C code
 compile src\main.c -o obj\main.asm
 if errorlevel 1 goto failed
 
+echo Convert the player sprite
+png2vircon images\player.png -o obj\player.vtex
+if errorlevel 1 goto failed
+
 echo Assemble the code
 assemble obj\main.asm -o obj\main.vbin
 if errorlevel 1 goto failed

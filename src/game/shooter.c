@@ -7,6 +7,7 @@
 
 #define MAX_BULLETS  12
 #define MAX_ENEMIES  5
+#define PLAYER_SPRITE_SIZE  128
 
 struct shooter_bullet
 {
@@ -113,7 +114,7 @@ void shooter_move_player()
 
     int next_x = game.player_x + delta_x;
 
-    if( next_x >= ARENA_MIN_X + 1 && next_x <= ARENA_MAX_X - 1 )
+    if( next_x >= ARENA_MIN_X + 3 && next_x <= ARENA_MAX_X - 3 )
       game.player_x = next_x;
 
     game.move_cooldown = 4;
@@ -269,8 +270,13 @@ void shooter_draw()
 
     if( game.invulnerability == 0 || game.frame % 6 < 3 )
     {
-        set_multiply_color( make_color_rgb( 60, 220, 255 ) );
-        print_at( game.player_x * 10, game.player_y * 20, "^" );
+        select_texture( 0 );
+        select_region( 0 );
+        define_region_center( 0, 0, PLAYER_SPRITE_SIZE, PLAYER_SPRITE_SIZE );
+        set_drawing_scale( 0.4375, 0.4375 );
+        set_multiply_color( color_white );
+        draw_region_zoomed_at( game.player_x * 10 + 5, game.player_y * 20 + 10 );
+        set_drawing_scale( 1, 1 );
     }
 }
 

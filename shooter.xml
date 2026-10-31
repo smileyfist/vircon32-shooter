@@ -2,6 +2,8 @@
 <rom-definition version="1.0">
     <rom type="cartridge" title="Neon Dusk" version="0.1" />
     <binary path="obj/main.vbin" />
-    <textures />
+    <textures>
+        <texture path="obj/player.vtex" />
+    </textures>
     <sounds />
 </rom-definition>

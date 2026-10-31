@@ -7,6 +7,7 @@
 
 #define MAX_BULLETS  12
 #define MAX_ENEMIES  5
+#define MAX_HEALTH  10
 #define PLAYER_SPRITE_SIZE  128
 #define BANKED_SPRITE_SIZE  160
 #define ENEMY_SPRITE_SIZE  128
@@ -94,7 +95,7 @@ void shooter_start()
     game.invulnerability = 0;
     game.frame = 0;
     game.score = 0;
-    game.health = 3;
+    game.health = MAX_HEALTH;
     game.wave = 0;
     game.game_over = false;
 
@@ -282,14 +283,14 @@ void shooter_draw()
 
     draw_arena_frame( (game.frame / 4) % 40 );
 
-    set_multiply_color( color_white );
-    print_at( 12, 8, "SHOOTY" );
-    print_at( 170, 8, "WAVE" );
-    draw_number( 220, 8, game.wave, 2 );
-    print_at( 280, 8, "SCORE" );
-    draw_number( 340, 8, game.score, 5 );
-    print_at( 485, 8, "HULL" );
-    draw_number( 535, 8, game.health, 1 );
+    select_texture( 6 );
+    select_region( 0 );
+    define_region_center( 0, 0, 16, 24 );
+    for( int segment = 0; segment < game.health; ++segment )
+      draw_region_zoomed_at(
+          SCREEN_WIDTH - 18,
+          30 + (MAX_HEALTH - game.health + segment) * 30
+      );
 
     select_texture( 3 );
     select_region( 0 );

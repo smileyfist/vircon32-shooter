@@ -10,6 +10,8 @@ A small Vircon32 top-down shooter called Shooty McShoots.
 - Survive waves of enemies. Each collision costs one of your three hull
   points; clearing a wave increases the next wave's size.
 - Earn points by hitting enemies. The game ends when your hull reaches zero.
+- Remaining hull is shown as a vertical, bright-green segmented bar on the
+  right side of the screen.
 - Select **PLAY** with **Enter** or any face button at the title screen. After
   the game-over screen's two-second lockout, press any button to return to the
   title screen.
@@ -17,8 +19,8 @@ A small Vircon32 top-down shooter called Shooty McShoots.
 The player uses the transparent sprite in `images\player.png`, a 128 x 128
 nearest-neighbor version of `images\playerShipNew.png`. Separate banked sprites
 raise one wing and lower the other while keeping the nose pointed up. The
-640 x 360 title screen uses `images\title.png`; the HUD and projectiles use the
-Vircon32 BIOS font. Enemies use a red, swept-wing alien ship with a blue canopy,
+640 x 360 title screen uses `images\title.png`; projectiles use the Vircon32
+BIOS font. Enemies use a red, swept-wing alien ship with a blue canopy,
 inspired by the supplied reference image.
 The game background is a slowly scrolling, vertically repeating starfield from
 `images\background1.png`, prepared as a seamless tile in
@@ -35,8 +37,8 @@ with separate `game`, `states`, and `utils` folders:
 - `src/states/` contains the title and game-over screens.
 - `src/utils/` contains shared constants and drawing helpers.
 - `images/` contains the original ship art, the 128 x 128 player sprite, and
-  left- and right-banked sprites, the red alien enemy ship, and title artwork.
-  It also contains the original and scroll-ready space backgrounds. All game
+  left- and right-banked sprites, the red alien enemy ship, title artwork,
+  health-bar segment, and original and scroll-ready space backgrounds. All game
   images are converted to Vircon32 textures during the build.
 
 Vircon32's C compiler accepts one source file per invocation, so `src/main.c`

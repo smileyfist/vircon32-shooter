@@ -9,6 +9,7 @@
         <texture path="obj/enemy-alien.vtex" />
         <texture path="obj/title.vtex" />
         <texture path="obj/space-background.vtex" />
+        <texture path="obj/health-segment.vtex" />
     </textures>
     <sounds />
 </rom-definition>

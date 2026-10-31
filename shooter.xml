@@ -11,6 +11,7 @@
         <texture path="obj/space-background.vtex" />
         <texture path="obj/health-segment.vtex" />
         <texture path="obj/health-background.vtex" />
+        <texture path="obj/laser-blast.vtex" />
     </textures>
     <sounds />
 </rom-definition>

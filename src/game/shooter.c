@@ -14,6 +14,7 @@
 #define ENEMY_SPRITE_SIZE  128
 #define ENEMY_DRAW_SIZE_PIXELS  38
 #define ENEMY_SPAWN_Y  -2
+#define LASER_SPRITE_SIZE  32
 
 struct shooter_bullet
 {
@@ -325,16 +326,20 @@ void shooter_draw()
     }
     set_drawing_scale( 1, 1 );
 
-    set_multiply_color( make_color_rgb( 255, 220, 90 ) );
+    select_texture( 8 );
+    select_region( 0 );
+    define_region_center( 0, 0, LASER_SPRITE_SIZE, LASER_SPRITE_SIZE * 2 );
+    set_drawing_scale( 0.5, 0.5 );
+    set_multiply_color( color_white );
     for( int slot = 0; slot < MAX_BULLETS; ++slot )
     {
         if( game.bullets[ slot ].active )
-          print_at(
-              game.bullets[ slot ].x * 10,
-              game.bullets[ slot ].y * PLAYER_Y_STEP_PIXELS,
-              "*"
+          draw_region_zoomed_at(
+              game.bullets[ slot ].x * 10 + 5,
+              game.bullets[ slot ].y * PLAYER_Y_STEP_PIXELS + 5
           );
     }
+    set_drawing_scale( 1, 1 );
 
     if( game.invulnerability == 0 || game.frame % 6 < 3 )
     {

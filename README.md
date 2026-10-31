@@ -21,9 +21,9 @@ A small Vircon32 top-down shooter called Shooty McShoots.
 The player uses the transparent sprite in `images\player.png`, a 128 x 128
 nearest-neighbor version of `images\playerShipNew.png`. Separate banked sprites
 raise one wing and lower the other while keeping the nose pointed up. The
-640 x 360 title screen uses `images\title.png`; projectiles use the Vircon32
-BIOS font. Enemies use a red, swept-wing alien ship with a blue canopy,
-inspired by the supplied reference image.
+640 x 360 title screen uses `images\title.png`; projectiles use the orange
+laser sprite in `images\laser-blast.png`. Enemies use a red, swept-wing alien
+ship with a blue canopy, inspired by the supplied reference image.
 The game background is a slowly scrolling, vertically repeating starfield from
 `images\background1.png`, prepared as a seamless tile in
 `images\space-background.png`.
@@ -40,8 +40,9 @@ with separate `game`, `states`, and `utils` folders:
 - `src/utils/` contains shared constants and drawing helpers.
 - `images/` contains the original ship art, the 128 x 128 player sprite, and
   left- and right-banked sprites, the red alien enemy ship, title artwork,
-  health-bar segment, and original and scroll-ready space backgrounds. All game
-  images are converted to Vircon32 textures during the build.
+  health-bar segment, laser sprite, and original and scroll-ready space
+  backgrounds. All game images are converted to Vircon32 textures during the
+  build.
 
 Vircon32's C compiler accepts one source file per invocation, so `src/main.c`
 includes the module `.c` files to build them together as one program.

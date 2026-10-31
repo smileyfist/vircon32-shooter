@@ -12,6 +12,8 @@
 #define PLAYER_SPRITE_SIZE  128
 #define BANKED_SPRITE_SIZE  160
 #define ENEMY_SPRITE_SIZE  128
+#define ENEMY_DRAW_SIZE_PIXELS  38
+#define ENEMY_SPAWN_Y  -2
 
 struct shooter_bullet
 {
@@ -56,7 +58,7 @@ void shooter_spawn_enemy( int slot )
 {
     game.enemies[ slot ].x = ARENA_MIN_X + 1 +
         ((slot * 11 + game.wave * 7) % (ARENA_MAX_X - ARENA_MIN_X - 1));
-    game.enemies[ slot ].y = ARENA_MIN_Y;
+    game.enemies[ slot ].y = ENEMY_SPAWN_Y;
     game.enemies[ slot ].active = true;
 }
 
@@ -229,7 +231,8 @@ void shooter_move_enemies()
             ++game.wave_kills;
             shooter_fill_enemy_slots();
         }
-        else if( enemy->y > ARENA_MAX_Y )
+        else if( enemy->y * 20 + 10 - ENEMY_DRAW_SIZE_PIXELS / 2 >=
+                 SCREEN_HEIGHT )
         {
             enemy->active = false;
             ++game.wave_kills;

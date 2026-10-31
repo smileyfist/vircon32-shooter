@@ -7,7 +7,8 @@ A small Vircon32 top-down shooter called Shooty McShoots.
 - Move around the playfield with the directional keys. The ship banks when
   moving left or right, always faces upward, and can reach both screen edges.
   Vertical movement has 32 positions.
-- Fire upward with **Z**. Enemies enter from the top and descend toward you.
+- Fire upward with **Z**. Enemies enter from the top and fly off the bottom
+  unless you shoot them.
 - Survive waves of enemies. Each collision costs one of your three hull
   points; clearing a wave increases the next wave's size.
 - Earn points by hitting enemies. The game ends when your hull reaches zero.

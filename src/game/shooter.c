@@ -19,6 +19,14 @@
 #define COIN_SPRITE_SIZE  16
 #define COIN_HITBOX_HALF_SIZE  8
 #define BACKGROUND_SCROLL_INTERVAL  4
+#define BACKGROUND_SCENE_HEIGHT  SCREEN_HEIGHT
+#define BACKGROUND_SCENE_COUNT  5
+#define BACKGROUND_WORLD_HEIGHT  (BACKGROUND_SCENE_COUNT * BACKGROUND_SCENE_HEIGHT)
+#define JUNGLE_BACKGROUND_TEXTURE_1  5
+#define JUNGLE_BACKGROUND_TEXTURE_2  13
+#define JUNGLE_BACKGROUND_TEXTURE_3  14
+#define JUNGLE_BACKGROUND_TEXTURE_4  15
+#define JUNGLE_BACKGROUND_TEXTURE_5  16
 #define PLAYER_MOVE_INTERVAL  2
 #define ENEMY_MOVE_INTERVAL  PLAYER_MOVE_INTERVAL
 #define PLAYER_SPRITE_SIZE  128
@@ -642,21 +650,63 @@ void shooter_update()
     ++game.frame;
 }
 
+void shooter_draw_background( int background_scroll )
+{
+    int source_y =
+        (BACKGROUND_WORLD_HEIGHT - background_scroll) %
+        BACKGROUND_WORLD_HEIGHT;
+    int destination_y = 0;
+    int remaining_height = SCREEN_HEIGHT;
+
+    while( remaining_height > 0 )
+    {
+        int scene_index = source_y / BACKGROUND_SCENE_HEIGHT;
+        int scene_y = source_y % BACKGROUND_SCENE_HEIGHT;
+        int scene_remaining = BACKGROUND_SCENE_HEIGHT - scene_y;
+        int draw_height = remaining_height;
+        int texture_id = JUNGLE_BACKGROUND_TEXTURE_1;
+
+        if( scene_index == 1 )
+          texture_id = JUNGLE_BACKGROUND_TEXTURE_2;
+        else if( scene_index == 2 )
+          texture_id = JUNGLE_BACKGROUND_TEXTURE_3;
+        else if( scene_index == 3 )
+          texture_id = JUNGLE_BACKGROUND_TEXTURE_4;
+        else if( scene_index == 4 )
+          texture_id = JUNGLE_BACKGROUND_TEXTURE_5;
+
+        if( draw_height > scene_remaining )
+          draw_height = scene_remaining;
+
+        select_texture( texture_id );
+        select_region( 0 );
+        define_region_center(
+            0,
+            scene_y,
+            SCREEN_WIDTH,
+            scene_y + draw_height
+        );
+        set_drawing_scale( 1, 1 );
+        set_multiply_color( color_white );
+        draw_region_zoomed_at(
+            SCREEN_WIDTH / 2,
+            destination_y + draw_height / 2
+        );
+
+        source_y += draw_height;
+        if( source_y >= BACKGROUND_WORLD_HEIGHT )
+          source_y = 0;
+        destination_y += draw_height;
+        remaining_height -= draw_height;
+    }
+}
+
 void shooter_draw()
 {
     int background_scroll =
-        (game.frame / BACKGROUND_SCROLL_INTERVAL) % SCREEN_HEIGHT;
-
-    select_texture( 5 );
-    select_region( 0 );
-    define_region_center( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT );
-    set_drawing_scale( 1, 1 );
-    set_multiply_color( color_white );
-    draw_region_zoomed_at( SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + background_scroll );
-    draw_region_zoomed_at(
-        SCREEN_WIDTH / 2,
-        SCREEN_HEIGHT / 2 + background_scroll - SCREEN_HEIGHT
-    );
+        (game.frame / BACKGROUND_SCROLL_INTERVAL) %
+        BACKGROUND_WORLD_HEIGHT;
+    shooter_draw_background( background_scroll );
 
     select_texture( 12 );
     set_drawing_scale( 0.3, 0.3 );

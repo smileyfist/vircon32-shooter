@@ -16,6 +16,10 @@
         <texture path="obj/explosion.vtex" />
         <texture path="obj/coin.vtex" />
         <texture path="obj/enemy-debris.vtex" />
+        <texture path="obj/jungle-background-2.vtex" />
+        <texture path="obj/jungle-background-3.vtex" />
+        <texture path="obj/jungle-background-4.vtex" />
+        <texture path="obj/jungle-background-5.vtex" />
     </textures>
     <sounds />
 </rom-definition>

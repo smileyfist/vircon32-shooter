@@ -22,6 +22,14 @@ png2vircon images\title-screen.png -o obj\title.vtex
 if errorlevel 1 goto failed
 png2vircon images\jungle-background.png -o obj\jungle-background.vtex
 if errorlevel 1 goto failed
+png2vircon images\jungle-background-2.png -o obj\jungle-background-2.vtex
+if errorlevel 1 goto failed
+png2vircon images\jungle-background-3.png -o obj\jungle-background-3.vtex
+if errorlevel 1 goto failed
+png2vircon images\jungle-background-4.png -o obj\jungle-background-4.vtex
+if errorlevel 1 goto failed
+png2vircon images\jungle-background-5.png -o obj\jungle-background-5.vtex
+if errorlevel 1 goto failed
 png2vircon images\health-segment.png -o obj\health-segment.vtex
 if errorlevel 1 goto failed
 png2vircon images\health-background.png -o obj\health-background.vtex

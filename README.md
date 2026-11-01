@@ -29,8 +29,12 @@ The title screen is a 640 x 360 center crop of `images\newerTitle.png`, saved
 as `images\title-screen.png` for the console's texture-size limit. The
 game-over screen uses `images\game-over-screen.png`.
 Enemies use a red, swept-wing alien ship with
-metal armor panels and a blue canopy. The game uses a slowly scrolling,
-vertically repeating aerial jungle tile in `images\jungle-background.png`.
+metal armor panels and a blue canopy. The game scrolls through five aerial
+jungle scenes in `images\jungle-background.png` and
+`images\jungle-background-2.png` through `-5.png` as consecutive sections,
+without runtime crossfades. Their edges are adjusted to meet seamlessly,
+including the loop back to the first scene. These 640 x 360 textures are
+prepared from `images\jungle1.png` through `images\jungle5.png`.
 
 ## Source layout
 
@@ -44,7 +48,7 @@ with separate `game`, `states`, and `utils` folders:
 - `src/utils/` contains shared constants and drawing helpers.
 - `images/` contains the player and banked sprites, enemy ship and debris,
   title and game-over screens, health-bar graphics, laser, explosion
-  animation, coin, and jungle game background. All game images are converted
+  animation, coin, and five jungle backgrounds. All game images are converted
   to Vircon32 textures during the build.
 
 Vircon32's C compiler accepts one source file per invocation, so `src/main.c`

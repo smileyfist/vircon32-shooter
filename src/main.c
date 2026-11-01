@@ -29,7 +29,6 @@ int read_gamepad_buttons()
       buttons |= 32;
     if( gamepad_button_r() > 0 )
       buttons |= 64;
-
     return buttons;
 }
 
@@ -52,10 +51,33 @@ void main( void )
             if( menu_input_delay_frames > 0 )
               --menu_input_delay_frames;
             else if( (gamepad_buttons & ~previous_gamepad_buttons) != 0 )
+              current_state = STATE_HANGAR;
+        }
+        else if( current_state == STATE_HANGAR )
+        {
+            int pressed_buttons =
+                gamepad_buttons & ~previous_gamepad_buttons;
+            menu_hangar_draw();
+
+            if( pressed_buttons != 0 )
             {
                 shooter_start();
                 current_state = STATE_PLAYING;
             }
+        }
+        else if( current_state == STATE_MAP )
+        {
+            int pressed_buttons =
+                gamepad_buttons & ~previous_gamepad_buttons;
+            menu_map_draw();
+
+            if( (pressed_buttons & 3) != 0 )
+            {
+                shooter_start();
+                current_state = STATE_PLAYING;
+            }
+            else if( (pressed_buttons & 4) != 0 )
+              current_state = STATE_MENU;
         }
         else if( current_state == STATE_PLAYING )
         {

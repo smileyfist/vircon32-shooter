@@ -3,9 +3,6 @@
     <rom type="cartridge" title="Shooty McShoots" version="0.1" />
     <binary path="obj/main.vbin" />
     <textures>
-        <texture path="obj/player.vtex" />
-        <texture path="obj/player-bank-left.vtex" />
-        <texture path="obj/player-bank-right.vtex" />
         <texture path="obj/enemy-01.vtex" />
         <texture path="obj/title.vtex" />
         <texture path="obj/jungle-background.vtex" />
@@ -32,6 +29,9 @@
         <texture path="obj/cloud-07.vtex" />
         <texture path="obj/cloud-08.vtex" />
         <texture path="obj/cloud-09.vtex" />
+        <texture path="obj/hangar.vtex" />
+        <texture path="obj/worldmap.vtex" />
+        <texture path="obj/ui-pixel.vtex" />
     </textures>
     <sounds />
 </rom-definition>

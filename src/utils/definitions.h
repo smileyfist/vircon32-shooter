@@ -4,6 +4,8 @@
 #define STATE_MENU       0
 #define STATE_PLAYING    1
 #define STATE_GAME_OVER  2
+#define STATE_HANGAR  3
+#define STATE_MAP  4
 
 #define ARENA_MIN_X  2
 #define ARENA_MAX_X  61

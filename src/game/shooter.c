@@ -29,20 +29,20 @@
 #define CLOUD_COUNT  9
 #define CLOUD_WORLD_HEIGHT  (BACKGROUND_WORLD_HEIGHT / 2)
 #define CLOUD_SCROLL_SPEED_MULTIPLIER  2
-#define CLOUD_TEXTURE_FIRST  20
+#define CLOUD_TEXTURE_FIRST  17
 #define CLOUD_DRAW_SCALE  0.5
-#define JUNGLE_BACKGROUND_TEXTURE_1  5
-#define JUNGLE_BACKGROUND_TEXTURE_2  13
-#define JUNGLE_BACKGROUND_TEXTURE_3  14
-#define JUNGLE_BACKGROUND_TEXTURE_4  15
-#define JUNGLE_BACKGROUND_TEXTURE_5  16
+#define JUNGLE_BACKGROUND_TEXTURE_1  2
+#define JUNGLE_BACKGROUND_TEXTURE_2  10
+#define JUNGLE_BACKGROUND_TEXTURE_3  11
+#define JUNGLE_BACKGROUND_TEXTURE_4  12
+#define JUNGLE_BACKGROUND_TEXTURE_5  13
 #define PLAYER_HORIZONTAL_MOVE_INTERVAL  2
 #define PLAYER_VERTICAL_MOVE_INTERVAL  1
 #define ENEMY_MOVE_INTERVAL  2
 #define PLAYER_BANK_FRAME_WIDTH  176
 #define PLAYER_BANK_FRAME_HEIGHT  240
-#define PLAYER_UP_TEXTURE  18
-#define PLAYER_DOWN_TEXTURE  19
+#define PLAYER_UP_TEXTURE  15
+#define PLAYER_DOWN_TEXTURE  16
 #define PLAYER_DIRECTION_UP  0
 #define PLAYER_DIRECTION_DOWN  1
 #define ENEMY_Y_STEP_PIXELS  10
@@ -159,8 +159,8 @@ struct shooter_game
 shooter_game game;
 shooter_enemy_type[ ENEMY_TYPE_COUNT ] shooter_enemy_types =
 {
-    { 3, 113, 150, 1, 1 },
-    { 17, 148, 132, 5, 2 }
+    { 0, 113, 150, 1, 1 },
+    { 14, 148, 132, 5, 2 }
 };
 
 shooter_cloud[ CLOUD_COUNT ] shooter_clouds =
@@ -853,7 +853,7 @@ void shooter_draw()
         BACKGROUND_WORLD_HEIGHT;
     shooter_draw_background( background_scroll );
 
-    select_texture( 12 );
+    select_texture( 9 );
     set_drawing_scale( 0.3, 0.3 );
     set_multiply_color( color_white );
     for( int slot = 0; slot < MAX_DEBRIS; ++slot )
@@ -879,14 +879,14 @@ void shooter_draw()
     }
     set_drawing_scale( 1, 1 );
 
-    select_texture( 7 );
+    select_texture( 4 );
     select_region( 0 );
     define_region_center( 0, 0, 16, SCREEN_HEIGHT );
     set_multiply_color( color_white );
     draw_region_zoomed_at( 8, SCREEN_HEIGHT / 2 );
     draw_region_zoomed_at( SCREEN_WIDTH - 8, SCREEN_HEIGHT / 2 );
 
-    select_texture( 6 );
+    select_texture( 3 );
     select_region( 0 );
     define_region_center( 0, 0, 16, 24 );
     set_multiply_color( color_white );
@@ -936,7 +936,7 @@ void shooter_draw()
     }
     set_drawing_scale( 1, 1 );
 
-    select_texture( 10 );
+    select_texture( 7 );
     select_region( 0 );
     set_drawing_scale( 0.5, 0.5 );
     set_multiply_color( color_white );
@@ -958,7 +958,7 @@ void shooter_draw()
     }
     set_drawing_scale( 1, 1 );
 
-    select_texture( 11 );
+    select_texture( 8 );
     set_drawing_scale( 1, 1 );
     set_multiply_color( color_white );
     for( int slot = 0; slot < MAX_COINS; ++slot )
@@ -978,7 +978,7 @@ void shooter_draw()
         }
     }
 
-    select_texture( 8 );
+    select_texture( 5 );
     select_region( 0 );
     define_region_center(
         LASER_TEXTURE_LEFT,
@@ -1025,7 +1025,7 @@ void shooter_draw()
 
     shooter_draw_cloud_layer( background_scroll );
 
-    select_texture( 11 );
+    select_texture( 8 );
     define_region_center(
         coin_frame_x,
         0,

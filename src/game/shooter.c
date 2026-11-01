@@ -7,6 +7,7 @@
 
 #define MAX_BULLETS  24
 #define MAX_ENEMIES  5
+#define ENEMY_TYPE_COUNT  2
 #define MAX_EXPLOSIONS  12
 #define MAX_COINS  8
 #define MAX_DEBRIS  240
@@ -34,12 +35,11 @@
 #define ENEMY_MOVE_INTERVAL  PLAYER_MOVE_INTERVAL
 #define PLAYER_SPRITE_SIZE  128
 #define BANKED_SPRITE_SIZE  160
-#define ENEMY_SPRITE_WIDTH  113
-#define ENEMY_SPRITE_HEIGHT  150
 #define ENEMY_Y_STEP_PIXELS  PLAYER_Y_STEP_PIXELS
 #define ENEMY_DRAW_SIZE_PIXELS  38
 #define ENEMY_HITBOX_HALF_SIZE  16
 #define ENEMY_SPAWN_Y  -4
+#define ENEMY_HIT_FLASH_DURATION  6
 #define LASER_TEXTURE_LEFT  6
 #define LASER_TEXTURE_TOP  1
 #define LASER_SPRITE_WIDTH  21
@@ -73,7 +73,20 @@ struct shooter_enemy
 {
     int x;
     int y;
+    int type;
+    int hit_points;
+    int move_cooldown;
+    int hit_flash;
     int active;
+};
+
+struct shooter_enemy_type
+{
+    int texture_id;
+    int sprite_width;
+    int sprite_height;
+    int hit_points;
+    int move_interval;
 };
 
 struct shooter_coin
@@ -113,6 +126,7 @@ struct shooter_game
     int wave_total;
     int wave_kills;
     int pending_enemies;
+    int next_enemy_type;
     int game_over;
     shooter_bullet[ MAX_BULLETS ] bullets;
     shooter_enemy[ MAX_ENEMIES ] enemies;
@@ -122,6 +136,11 @@ struct shooter_game
 };
 
 shooter_game game;
+shooter_enemy_type[ ENEMY_TYPE_COUNT ] shooter_enemy_types =
+{
+    { 3, 113, 150, 1, 1 },
+    { 17, 148, 132, 10, 2 }
+};
 
 int shooter_random( int limit )
 {
@@ -254,10 +273,18 @@ void shooter_update_explosions()
 
 void shooter_spawn_enemy( int slot )
 {
-    game.enemies[ slot ].x = ARENA_MIN_X + 1 +
+    shooter_enemy* enemy = &game.enemies[ slot ];
+    enemy->x = ARENA_MIN_X + 1 +
         ((slot * 11 + game.wave * 7) % (ARENA_MAX_X - ARENA_MIN_X - 1));
-    game.enemies[ slot ].y = ENEMY_SPAWN_Y;
-    game.enemies[ slot ].active = true;
+    enemy->y = ENEMY_SPAWN_Y;
+    enemy->type = game.next_enemy_type;
+    enemy->hit_points = shooter_enemy_types[ enemy->type ].hit_points;
+    enemy->move_cooldown = 0;
+    enemy->hit_flash = 0;
+    enemy->active = true;
+    ++game.next_enemy_type;
+    if( game.next_enemy_type >= ENEMY_TYPE_COUNT )
+      game.next_enemy_type = 0;
 }
 
 void shooter_fill_enemy_slots()
@@ -300,6 +327,7 @@ void shooter_start()
     game.random_seed = 1;
     game.health = MAX_HEALTH;
     game.wave = 0;
+    game.next_enemy_type = 0;
     game.game_over = false;
 
     for( int slot = 0; slot < MAX_BULLETS; ++slot )
@@ -529,14 +557,20 @@ void shooter_update_bullets()
                 bullet_max_y + LASER_HITBOX_HALF_HEIGHT >=
                   enemy_y - ENEMY_HITBOX_HALF_SIZE )
             {
-                shooter_spawn_explosion( enemy_x, enemy_y );
-                shooter_spawn_debris( enemy_x, enemy_y );
-                shooter_maybe_drop_coin( enemy->x, enemy->y );
-                enemy->active = false;
                 bullet->active = false;
-                game.score += 100;
-                ++game.wave_kills;
-                shooter_fill_enemy_slots();
+                --enemy->hit_points;
+                if( enemy->hit_points <= 0 )
+                {
+                    shooter_spawn_explosion( enemy_x, enemy_y );
+                    shooter_spawn_debris( enemy_x, enemy_y );
+                    shooter_maybe_drop_coin( enemy->x, enemy->y );
+                    enemy->active = false;
+                    game.score += 100;
+                    ++game.wave_kills;
+                    shooter_fill_enemy_slots();
+                }
+                else
+                  enemy->hit_flash = ENEMY_HIT_FLASH_DURATION;
                 break;
             }
         }
@@ -604,7 +638,15 @@ void shooter_move_enemies()
         if( !enemy->active )
           continue;
 
+        if( enemy->move_cooldown > 0 )
+        {
+            --enemy->move_cooldown;
+            continue;
+        }
+
         ++enemy->y;
+        enemy->move_cooldown =
+            shooter_enemy_types[ enemy->type ].move_interval - 1;
 
         if( enemy->y * ENEMY_Y_STEP_PIXELS + 10 -
             ENEMY_DRAW_SIZE_PIXELS / 2 >=
@@ -630,6 +672,13 @@ void shooter_update()
       --game.enemy_cooldown;
     if( game.invulnerability > 0 )
       --game.invulnerability;
+
+    for( int slot = 0; slot < MAX_ENEMIES; ++slot )
+    {
+        shooter_enemy* enemy = &game.enemies[ slot ];
+        if( enemy->active && enemy->hit_flash > 0 )
+          --enemy->hit_flash;
+    }
 
     shooter_update_explosions();
 
@@ -771,24 +820,32 @@ void shooter_draw()
     }
     set_drawing_scale( 1, 1 );
 
-    select_texture( 3 );
-    select_region( 0 );
-    define_region_center(
-        0,
-        0,
-        ENEMY_SPRITE_WIDTH,
-        ENEMY_SPRITE_HEIGHT
-    );
     set_drawing_scale( 0.3, 0.3 );
     set_multiply_color( color_white );
 
     for( int slot = 0; slot < MAX_ENEMIES; ++slot )
     {
         if( game.enemies[ slot ].active )
-          draw_region_zoomed_at(
-              game.enemies[ slot ].x * 10 + 5,
-              game.enemies[ slot ].y * ENEMY_Y_STEP_PIXELS + 10
-          );
+        {
+            shooter_enemy* enemy = &game.enemies[ slot ];
+            shooter_enemy_type* enemy_type =
+                &shooter_enemy_types[ enemy->type ];
+            select_texture( enemy_type->texture_id );
+            select_region( 0 );
+            define_region_center(
+                0,
+                0,
+                enemy_type->sprite_width,
+                enemy_type->sprite_height
+            );
+            if( enemy->hit_flash > 0 )
+              set_multiply_color( color_red );
+            draw_region_zoomed_at(
+                enemy->x * 10 + 5,
+                enemy->y * ENEMY_Y_STEP_PIXELS + 10
+            );
+            set_multiply_color( color_white );
+        }
     }
     set_drawing_scale( 1, 1 );
 

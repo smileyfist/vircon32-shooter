@@ -20,6 +20,7 @@
         <texture path="obj/jungle-background-3.vtex" />
         <texture path="obj/jungle-background-4.vtex" />
         <texture path="obj/jungle-background-5.vtex" />
+        <texture path="obj/enemy-02.vtex" />
     </textures>
     <sounds />
 </rom-definition>

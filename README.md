@@ -30,9 +30,12 @@ sprites raise one wing and lower the other while keeping the nose pointed up.
 The title screen is a 640 x 360 center crop of `images\newerTitle.png`, saved
 as `images\title-screen.png` for the console's texture-size limit. The
 game-over screen uses `images\game-over-screen.png`.
-Enemies use `images\enemy-01.png`, split from the enemy sprite sheet. Enemy
-destruction scatters ten fragments from `images\enemy-01-debri.png`, with
-five fragments charred black. The game scrolls through five aerial
+Enemies use the first two ships from the enemy sprite sheet:
+`images\enemy-01.png` takes one hit, while `images\enemy-02.png` takes ten and
+moves at half speed. Their stats, movement intervals, and texture sizes are
+defined per enemy type. Enemy destruction scatters ten fragments from
+`images\enemy-01-debri.png`, with five fragments charred black. The game
+scrolls through five aerial
 jungle scenes in `images\jungle-background.png` and
 `images\jungle-background-2.png` through `-5.png` as consecutive sections,
 without runtime crossfades. Their edges are adjusted to meet seamlessly,

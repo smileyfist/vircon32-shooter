@@ -16,6 +16,8 @@ png2vircon images\player-bank-right.png -o obj\player-bank-right.vtex
 if errorlevel 1 goto failed
 png2vircon images\enemy-01.png -o obj\enemy-01.vtex
 if errorlevel 1 goto failed
+png2vircon images\enemy-02.png -o obj\enemy-02.vtex
+if errorlevel 1 goto failed
 png2vircon images\enemy-01-debri.png -o obj\enemy-debris.vtex
 if errorlevel 1 goto failed
 png2vircon images\title-screen.png -o obj\title.vtex

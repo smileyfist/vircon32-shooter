@@ -35,9 +35,9 @@ uses the bottom row. Straight, light-bank, and hard-bank frames follow the
 player's horizontal and diagonal movement.
 The title screen is a 640 x 360 center crop of `unused\newerTitle.png`, saved
 as `images\title-screen.png` for the console's texture-size limit. The hangar
-screen uses `images\hangar-screen.png`, and the game-over screen uses
-`images\game-over-screen.png`. The map screen remains in the project for
-future use.
+screen uses `images\hangar-screen.png`, prepared from `images\hangar2.png`;
+the game-over screen uses `images\game-over-screen.png`. The map screen
+remains in the project for future use.
 Enemies use the first two ships from the enemy sprite sheet:
 `images\enemy-01.png` takes one hit, while `images\enemy-02.png` takes five and
 moves at half speed. Their stats, movement intervals, and texture sizes are

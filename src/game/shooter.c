@@ -18,6 +18,8 @@
 #define MAX_HEALTH  20
 #define COIN_DROP_CHANCE  4
 #define COIN_SPRITE_SIZE  16
+#define COIN_SPIN_FRAME_COUNT  8
+#define COIN_SPIN_FRAME_DURATION  4
 #define COIN_HITBOX_HALF_SIZE  8
 #define BACKGROUND_SCROLL_INTERVAL  4
 #define BACKGROUND_SCENE_HEIGHT  SCREEN_HEIGHT
@@ -707,6 +709,9 @@ void shooter_draw_background( int background_scroll )
 
 void shooter_draw()
 {
+    int coin_frame =
+        (game.frame / COIN_SPIN_FRAME_DURATION) % COIN_SPIN_FRAME_COUNT;
+    int coin_frame_x = coin_frame * COIN_SPRITE_SIZE;
     int background_scroll =
         (game.frame / BACKGROUND_SCROLL_INTERVAL) %
         BACKGROUND_WORLD_HEIGHT;
@@ -810,17 +815,23 @@ void shooter_draw()
     set_drawing_scale( 1, 1 );
 
     select_texture( 11 );
-    select_region( 0 );
-    define_region_center( 0, 0, COIN_SPRITE_SIZE, COIN_SPRITE_SIZE );
     set_drawing_scale( 1, 1 );
     set_multiply_color( color_white );
     for( int slot = 0; slot < MAX_COINS; ++slot )
     {
         if( game.coins[ slot ].active )
+        {
+            define_region_center(
+                coin_frame_x,
+                0,
+                coin_frame_x + COIN_SPRITE_SIZE,
+                COIN_SPRITE_SIZE
+            );
           draw_region_zoomed_at(
               game.coins[ slot ].x * 10 + 5,
               game.coins[ slot ].y_pixels
           );
+        }
     }
 
     select_texture( 8 );
@@ -875,8 +886,12 @@ void shooter_draw()
     set_drawing_scale( 1, 1 );
 
     select_texture( 11 );
-    select_region( 0 );
-    define_region_center( 0, 0, COIN_SPRITE_SIZE, COIN_SPRITE_SIZE );
+    define_region_center(
+        coin_frame_x,
+        0,
+        coin_frame_x + COIN_SPRITE_SIZE,
+        COIN_SPRITE_SIZE
+    );
     set_drawing_scale( 1, 1 );
     set_multiply_color( color_white );
     draw_region_zoomed_at( 16, SCREEN_HEIGHT - 16 );

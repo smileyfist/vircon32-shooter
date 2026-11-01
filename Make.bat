@@ -40,7 +40,7 @@ png2vircon images\game-over-screen.png -o obj\game-over-screen.vtex
 if errorlevel 1 goto failed
 png2vircon images\explosion-frames.png -o obj\explosion.vtex
 if errorlevel 1 goto failed
-png2vircon images\coin.png -o obj\coin.vtex
+png2vircon images\coin-spin.png -o obj\coin.vtex
 if errorlevel 1 goto failed
 
 echo Assemble the code

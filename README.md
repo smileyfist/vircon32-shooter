@@ -12,8 +12,9 @@ A small Vircon32 top-down shooter called Shooty McShoots.
 - Survive waves of enemies. Each collision costs one of your three hull
   points; clearing a wave increases the next wave's size.
 - Earn points by hitting enemies. The game ends when your hull reaches zero.
-- Occasionally, destroyed enemy ships drop a gold coin. Collect it by flying
-  into it; your coin total appears at the bottom-left of the playfield.
+- Occasionally, destroyed enemy ships drop a spinning gold coin. Collect it
+  by flying into it; your coin total appears at the bottom-left of the
+  playfield.
 - Remaining hull is shown as a vertical, bright-green segmented bar on the
   far right over a black backing, with up to 20 segments.
 - Enemy ships burst into a brief five-frame pixel-art explosion when hit,

@@ -31,11 +31,13 @@
 #define JUNGLE_BACKGROUND_TEXTURE_3  14
 #define JUNGLE_BACKGROUND_TEXTURE_4  15
 #define JUNGLE_BACKGROUND_TEXTURE_5  16
-#define PLAYER_MOVE_INTERVAL  2
-#define ENEMY_MOVE_INTERVAL  PLAYER_MOVE_INTERVAL
+#define PLAYER_HORIZONTAL_MOVE_INTERVAL  2
+#define PLAYER_VERTICAL_MOVE_INTERVAL  1
+#define ENEMY_MOVE_INTERVAL  2
 #define PLAYER_SPRITE_SIZE  128
 #define BANKED_SPRITE_SIZE  160
-#define ENEMY_Y_STEP_PIXELS  PLAYER_Y_STEP_PIXELS
+#define ENEMY_Y_STEP_PIXELS  10
+#define PLAYER_BULLET_Y_OFFSET_PIXELS  10
 #define ENEMY_DRAW_SIZE_PIXELS  38
 #define ENEMY_HITBOX_HALF_SIZE  16
 #define ENEMY_SPAWN_Y  -4
@@ -113,7 +115,8 @@ struct shooter_game
     int player_x;
     int player_y;
     int player_bank;
-    int move_cooldown;
+    int horizontal_move_cooldown;
+    int vertical_move_cooldown;
     int fire_cooldown;
     int enemy_cooldown;
     int invulnerability;
@@ -139,7 +142,7 @@ shooter_game game;
 shooter_enemy_type[ ENEMY_TYPE_COUNT ] shooter_enemy_types =
 {
     { 3, 113, 150, 1, 1 },
-    { 17, 148, 132, 10, 2 }
+    { 17, 148, 132, 5, 2 }
 };
 
 int shooter_random( int limit )
@@ -249,7 +252,7 @@ void shooter_maybe_drop_coin( int x, int y )
         if( !coin->active )
         {
             coin->x = x;
-            coin->y_pixels = y * PLAYER_Y_STEP_PIXELS + 10;
+            coin->y_pixels = y * ENEMY_Y_STEP_PIXELS + 10;
             coin->active = true;
             return;
         }
@@ -315,9 +318,10 @@ void shooter_begin_wave()
 void shooter_start()
 {
     game.player_x = 32;
-    game.player_y = (ARENA_MAX_Y - 1) * 2;
+    game.player_y = PLAYER_START_Y;
     game.player_bank = 0;
-    game.move_cooldown = 0;
+    game.horizontal_move_cooldown = 0;
+    game.vertical_move_cooldown = 0;
     game.fire_cooldown = 0;
     game.enemy_cooldown = 0;
     game.invulnerability = 0;
@@ -366,20 +370,26 @@ void shooter_move_player()
     int next_x = game.player_x + delta_x;
     int next_y = game.player_y + delta_y;
 
-    if( delta_x != 0 &&
-        next_x >= PLAYER_MIN_X && next_x <= PLAYER_MAX_X )
+    if( delta_x == 0 )
+      game.player_bank = 0;
+    else if( game.horizontal_move_cooldown == 0 )
     {
-        game.player_x = next_x;
-        game.player_bank = delta_x;
+        if( next_x >= PLAYER_MIN_X && next_x <= PLAYER_MAX_X )
+        {
+            game.player_x = next_x;
+            game.player_bank = delta_x;
+        }
+        else
+          game.player_bank = 0;
+        game.horizontal_move_cooldown = PLAYER_HORIZONTAL_MOVE_INTERVAL;
     }
-    else if( delta_x != 0 )
-        game.player_bank = 0;
 
-    if( delta_y != 0 &&
-        next_y >= PLAYER_MIN_Y && next_y <= PLAYER_MAX_Y )
-      game.player_y = next_y;
-
-    game.move_cooldown = PLAYER_MOVE_INTERVAL;
+    if( delta_y != 0 && game.vertical_move_cooldown == 0 )
+    {
+        if( next_y >= PLAYER_MIN_Y && next_y <= PLAYER_MAX_Y )
+          game.player_y = next_y;
+        game.vertical_move_cooldown = PLAYER_VERTICAL_MOVE_INTERVAL;
+    }
 }
 
 void shooter_fire()
@@ -415,7 +425,7 @@ void shooter_fire()
           bullet->x = ARENA_MAX_X - 1;
         bullet->y = game.player_y;
         bullet->dx = 0;
-        bullet->dy = -2;
+        bullet->dy = -4;
         bullet->active = true;
     }
 
@@ -442,7 +452,8 @@ int shooter_boxes_overlap(
 void shooter_update_coins()
 {
     int player_x = game.player_x * 10 + 5;
-    int player_y = game.player_y * PLAYER_Y_STEP_PIXELS + 10;
+    int player_y =
+        game.player_y * PLAYER_Y_STEP_PIXELS + PLAYER_Y_OFFSET_PIXELS;
 
     for( int slot = 0; slot < MAX_COINS; ++slot )
     {
@@ -535,8 +546,12 @@ void shooter_update_bullets()
         {
             shooter_enemy* enemy = &game.enemies[ enemy_slot ];
             int bullet_x = bullet->x * 10 + 5;
-            int bullet_start_y = previous_y * PLAYER_Y_STEP_PIXELS + 5;
-            int bullet_end_y = bullet->y * PLAYER_Y_STEP_PIXELS + 5;
+            int bullet_start_y =
+                previous_y * PLAYER_Y_STEP_PIXELS +
+                PLAYER_BULLET_Y_OFFSET_PIXELS;
+            int bullet_end_y =
+                bullet->y * PLAYER_Y_STEP_PIXELS +
+                PLAYER_BULLET_Y_OFFSET_PIXELS;
             int bullet_min_y = bullet_start_y;
             int bullet_max_y = bullet_end_y;
             if( bullet_min_y > bullet_max_y )
@@ -575,7 +590,8 @@ void shooter_update_bullets()
             }
         }
 
-        if( bullet->y * PLAYER_Y_STEP_PIXELS + 5 +
+        if( bullet->y * PLAYER_Y_STEP_PIXELS +
+            PLAYER_BULLET_Y_OFFSET_PIXELS +
             LASER_HITBOX_HALF_HEIGHT < 0 )
           bullet->active = false;
     }
@@ -587,7 +603,8 @@ void shooter_update_bullets()
 void shooter_check_player_collisions()
 {
     int player_x = game.player_x * 10 + 5;
-    int player_y = game.player_y * PLAYER_Y_STEP_PIXELS + 10;
+    int player_y =
+        game.player_y * PLAYER_Y_STEP_PIXELS + PLAYER_Y_OFFSET_PIXELS;
 
     for( int slot = 0; slot < MAX_ENEMIES; ++slot )
     {
@@ -664,8 +681,10 @@ void shooter_move_enemies()
 
 void shooter_update()
 {
-    if( game.move_cooldown > 0 )
-      --game.move_cooldown;
+    if( game.horizontal_move_cooldown > 0 )
+      --game.horizontal_move_cooldown;
+    if( game.vertical_move_cooldown > 0 )
+      --game.vertical_move_cooldown;
     if( game.fire_cooldown > 0 )
       --game.fire_cooldown;
     if( game.enemy_cooldown > 0 )
@@ -682,7 +701,8 @@ void shooter_update()
 
     shooter_update_explosions();
 
-    if( game.move_cooldown == 0 )
+    if( game.horizontal_move_cooldown == 0 ||
+        game.vertical_move_cooldown == 0 )
       shooter_move_player();
 
     if( gamepad_button_b() > 0 && game.fire_cooldown == 0 )
@@ -906,7 +926,8 @@ void shooter_draw()
         if( game.bullets[ slot ].active )
           draw_region_zoomed_at(
               game.bullets[ slot ].x * 10 + 5,
-              game.bullets[ slot ].y * PLAYER_Y_STEP_PIXELS + 5
+              game.bullets[ slot ].y * PLAYER_Y_STEP_PIXELS +
+              PLAYER_BULLET_Y_OFFSET_PIXELS
           );
     }
     set_drawing_scale( 1, 1 );
@@ -938,7 +959,8 @@ void shooter_draw()
       set_multiply_color( color_white );
     draw_region_zoomed_at(
         game.player_x * 10 + 5,
-        game.player_y * PLAYER_Y_STEP_PIXELS + 10
+        game.player_y * PLAYER_Y_STEP_PIXELS +
+        PLAYER_Y_OFFSET_PIXELS
     );
     set_drawing_scale( 1, 1 );
 

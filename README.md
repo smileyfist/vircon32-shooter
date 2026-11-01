@@ -6,7 +6,7 @@ A small Vircon32 top-down shooter called Shooty McShoots.
 
 - Move around the playfield with the directional keys. The ship banks when
   moving left or right, always faces upward, and can reach both screen edges.
-  Vertical movement has 32 positions.
+  Vertical movement has 64 positions.
 - Fire upward with **Z**. Enemies enter from the top and fly off the bottom
   unless you shoot them.
 - Survive waves of enemies. Each collision costs one of your three hull
@@ -31,7 +31,7 @@ The title screen is a 640 x 360 center crop of `images\newerTitle.png`, saved
 as `images\title-screen.png` for the console's texture-size limit. The
 game-over screen uses `images\game-over-screen.png`.
 Enemies use the first two ships from the enemy sprite sheet:
-`images\enemy-01.png` takes one hit, while `images\enemy-02.png` takes ten and
+`images\enemy-01.png` takes one hit, while `images\enemy-02.png` takes five and
 moves at half speed. Their stats, movement intervals, and texture sizes are
 defined per enemy type. Enemy destruction scatters ten fragments from
 `images\enemy-01-debri.png`, with five fragments charred black. The game

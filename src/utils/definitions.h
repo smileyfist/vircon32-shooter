@@ -11,8 +11,10 @@
 #define ARENA_MAX_Y  15
 
 #define PLAYER_MIN_Y  1
-#define PLAYER_MAX_Y  32
-#define PLAYER_Y_STEP_PIXELS  10
+#define PLAYER_MAX_Y  64
+#define PLAYER_START_Y  55
+#define PLAYER_Y_STEP_PIXELS  5
+#define PLAYER_Y_OFFSET_PIXELS  15
 #define PLAYER_MIN_X  3
 #define PLAYER_MAX_X  60
 

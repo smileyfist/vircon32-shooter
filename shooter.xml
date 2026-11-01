@@ -8,7 +8,7 @@
         <texture path="obj/player-bank-right.vtex" />
         <texture path="obj/enemy-alien.vtex" />
         <texture path="obj/title.vtex" />
-        <texture path="obj/space-background.vtex" />
+        <texture path="obj/jungle-background.vtex" />
         <texture path="obj/health-segment.vtex" />
         <texture path="obj/health-background.vtex" />
         <texture path="obj/laser-blast.vtex" />

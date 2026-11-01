@@ -14,6 +14,10 @@ png2vircon images\player-bank-left.png -o obj\player-bank-left.vtex
 if errorlevel 1 goto failed
 png2vircon images\player-bank-right.png -o obj\player-bank-right.vtex
 if errorlevel 1 goto failed
+png2vircon images\player-up-banking.png -o obj\player-up-banking.vtex
+if errorlevel 1 goto failed
+png2vircon images\player-down-banking.png -o obj\player-down-banking.vtex
+if errorlevel 1 goto failed
 png2vircon images\enemy-01.png -o obj\enemy-01.vtex
 if errorlevel 1 goto failed
 png2vircon images\enemy-02.png -o obj\enemy-02.vtex

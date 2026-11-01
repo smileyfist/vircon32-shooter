@@ -34,8 +34,12 @@
 #define PLAYER_HORIZONTAL_MOVE_INTERVAL  2
 #define PLAYER_VERTICAL_MOVE_INTERVAL  1
 #define ENEMY_MOVE_INTERVAL  2
-#define PLAYER_SPRITE_SIZE  128
-#define BANKED_SPRITE_SIZE  160
+#define PLAYER_BANK_FRAME_WIDTH  176
+#define PLAYER_BANK_FRAME_HEIGHT  240
+#define PLAYER_UP_TEXTURE  18
+#define PLAYER_DOWN_TEXTURE  19
+#define PLAYER_DIRECTION_UP  0
+#define PLAYER_DIRECTION_DOWN  1
 #define ENEMY_Y_STEP_PIXELS  10
 #define PLAYER_BULLET_Y_OFFSET_PIXELS  10
 #define ENEMY_DRAW_SIZE_PIXELS  38
@@ -115,6 +119,7 @@ struct shooter_game
     int player_x;
     int player_y;
     int player_bank;
+    int player_direction;
     int horizontal_move_cooldown;
     int vertical_move_cooldown;
     int fire_cooldown;
@@ -320,6 +325,7 @@ void shooter_start()
     game.player_x = 32;
     game.player_y = PLAYER_START_Y;
     game.player_bank = 0;
+    game.player_direction = PLAYER_DIRECTION_UP;
     game.horizontal_move_cooldown = 0;
     game.vertical_move_cooldown = 0;
     game.fire_cooldown = 0;
@@ -377,7 +383,10 @@ void shooter_move_player()
         if( next_x >= PLAYER_MIN_X && next_x <= PLAYER_MAX_X )
         {
             game.player_x = next_x;
-            game.player_bank = delta_x;
+            int bank_strength = 1;
+            if( delta_y != 0 )
+              bank_strength = 2;
+            game.player_bank = delta_x * bank_strength;
         }
         else
           game.player_bank = 0;
@@ -386,6 +395,11 @@ void shooter_move_player()
 
     if( delta_y != 0 && game.vertical_move_cooldown == 0 )
     {
+        if( delta_y < 0 )
+          game.player_direction = PLAYER_DIRECTION_UP;
+        else
+          game.player_direction = PLAYER_DIRECTION_DOWN;
+
         if( next_y >= PLAYER_MIN_Y && next_y <= PLAYER_MAX_Y )
           game.player_y = next_y;
         game.vertical_move_cooldown = PLAYER_VERTICAL_MOVE_INTERVAL;
@@ -932,27 +946,19 @@ void shooter_draw()
     }
     set_drawing_scale( 1, 1 );
 
-    int texture_id = 0;
-    int sprite_size = PLAYER_SPRITE_SIZE;
-    float sprite_scale = 0.4375;
-
-    if( game.player_bank < 0 )
-    {
-        texture_id = 1;
-        sprite_size = BANKED_SPRITE_SIZE;
-        sprite_scale = 0.4375;
-    }
-    else if( game.player_bank > 0 )
-    {
-        texture_id = 2;
-        sprite_size = BANKED_SPRITE_SIZE;
-        sprite_scale = 0.4375;
-    }
-
+    int texture_id = PLAYER_UP_TEXTURE;
+    if( game.player_direction == PLAYER_DIRECTION_DOWN )
+      texture_id = PLAYER_DOWN_TEXTURE;
+    int bank_column = game.player_bank + 2;
     select_texture( texture_id );
     select_region( 0 );
-    define_region_center( 0, 0, sprite_size, sprite_size );
-    set_drawing_scale( sprite_scale, sprite_scale );
+    define_region_center(
+        bank_column * PLAYER_BANK_FRAME_WIDTH,
+        0,
+        (bank_column + 1) * PLAYER_BANK_FRAME_WIDTH,
+        PLAYER_BANK_FRAME_HEIGHT
+    );
+    set_drawing_scale( 0.3, 0.3 );
     if( game.invulnerability > 0 )
       set_multiply_color( color_red );
     else

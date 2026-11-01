@@ -25,8 +25,11 @@ A small Vircon32 top-down shooter called Shooty McShoots.
   the game-over screen's two-second lockout, press any button to return to the
   title screen.
 
-The player uses the transparent sprite in `images\player.png`; separate banked
-sprites raise one wing and lower the other while keeping the nose pointed up.
+The player uses five bank angles from the top and bottom rows of the supplied
+sprite sheet, prepared as `images\player-down-banking.png` and
+`images\player-up-banking.png`. Moving down uses the top thrust row; moving up
+uses the bottom row. Straight, light-bank, and hard-bank frames follow the
+player's horizontal and diagonal movement.
 The title screen is a 640 x 360 center crop of `images\newerTitle.png`, saved
 as `images\title-screen.png` for the console's texture-size limit. The
 game-over screen uses `images\game-over-screen.png`.

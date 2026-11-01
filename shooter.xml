@@ -21,6 +21,8 @@
         <texture path="obj/jungle-background-4.vtex" />
         <texture path="obj/jungle-background-5.vtex" />
         <texture path="obj/enemy-02.vtex" />
+        <texture path="obj/player-up-banking.vtex" />
+        <texture path="obj/player-down-banking.vtex" />
     </textures>
     <sounds />
 </rom-definition>

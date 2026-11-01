@@ -988,6 +988,7 @@ void shooter_draw()
         ++coin_digits;
     }
     draw_number( 30, SCREEN_HEIGHT - 26, game.coins_collected, coin_digits );
+    draw_number( 31, SCREEN_HEIGHT - 26, game.coins_collected, coin_digits );
 }
 
 int shooter_is_game_over()

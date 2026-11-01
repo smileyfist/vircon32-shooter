@@ -18,7 +18,7 @@ png2vircon images\enemy-alien.png -o obj\enemy-alien.vtex
 if errorlevel 1 goto failed
 png2vircon images\enemy-debris.png -o obj\enemy-debris.vtex
 if errorlevel 1 goto failed
-png2vircon images\title.png -o obj\title.vtex
+png2vircon images\title-screen.png -o obj\title.vtex
 if errorlevel 1 goto failed
 png2vircon images\jungle-background.png -o obj\jungle-background.vtex
 if errorlevel 1 goto failed

@@ -9,15 +9,16 @@
 #define MAX_ENEMIES  5
 #define MAX_EXPLOSIONS  12
 #define MAX_COINS  8
-#define MAX_DEBRIS  120
+#define MAX_DEBRIS  240
 #define DEBRIS_PIECE_COUNT  12
 #define DEBRIS_CELL_SIZE  32
 #define DEBRIS_BURST_DURATION  24
+#define DEBRIS_RENDER_HALF_SIZE  5
 #define MAX_HEALTH  20
 #define COIN_DROP_CHANCE  4
 #define COIN_SPRITE_SIZE  16
 #define COIN_HITBOX_HALF_SIZE  8
-#define BACKGROUND_SCROLL_INTERVAL  8
+#define BACKGROUND_SCROLL_INTERVAL  4
 #define PLAYER_MOVE_INTERVAL  2
 #define ENEMY_MOVE_INTERVAL  PLAYER_MOVE_INTERVAL
 #define PLAYER_SPRITE_SIZE  128
@@ -140,8 +141,6 @@ void shooter_spawn_debris( int x, int y )
     for( int piece = 0; piece < DEBRIS_PIECE_COUNT; ++piece )
     {
         int debris_slot = -1;
-        int oldest_grounded_slot = -1;
-        int oldest_grounded_age = -1;
 
         for( int slot = 0; slot < MAX_DEBRIS; ++slot )
         {
@@ -151,17 +150,10 @@ void shooter_spawn_debris( int x, int y )
                 debris_slot = slot;
                 break;
             }
-            if( debris->grounded && debris->age > oldest_grounded_age )
-            {
-                oldest_grounded_slot = slot;
-                oldest_grounded_age = debris->age;
-            }
         }
 
         if( debris_slot < 0 )
-          debris_slot = oldest_grounded_slot;
-        if( debris_slot < 0 )
-          continue;
+          break;
 
         int direction = (piece + direction_offset) % 8;
         int base_velocity_x = 0;
@@ -469,9 +461,12 @@ void shooter_update_debris()
               debris->y_subpixels += 16;
         }
 
-        if( debris->x_subpixels < -32 * 16 ||
-            debris->x_subpixels > (SCREEN_WIDTH + 32) * 16 ||
-            debris->y_subpixels > (SCREEN_HEIGHT + 32) * 16 )
+        if( debris->x_subpixels <= -DEBRIS_RENDER_HALF_SIZE * 16 ||
+            debris->x_subpixels >=
+              (SCREEN_WIDTH + DEBRIS_RENDER_HALF_SIZE) * 16 ||
+            debris->y_subpixels <= -DEBRIS_RENDER_HALF_SIZE * 16 ||
+            debris->y_subpixels >=
+              (SCREEN_HEIGHT + DEBRIS_RENDER_HALF_SIZE) * 16 )
           debris->active = false;
     }
 }

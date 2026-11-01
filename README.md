@@ -25,8 +25,10 @@ A small Vircon32 top-down shooter called Shooty McShoots.
 
 The player uses the transparent sprite in `images\player.png`; separate banked
 sprites raise one wing and lower the other while keeping the nose pointed up.
-The 640 x 360 title and game-over screens use `images\title.png` and
-`images\game-over-screen.png`. Enemies use a red, swept-wing alien ship with
+The title screen is a 640 x 360 center crop of `images\newerTitle.png`, saved
+as `images\title-screen.png` for the console's texture-size limit. The
+game-over screen uses `images\game-over-screen.png`.
+Enemies use a red, swept-wing alien ship with
 metal armor panels and a blue canopy. The game uses a slowly scrolling,
 vertically repeating aerial jungle tile in `images\jungle-background.png`.
 

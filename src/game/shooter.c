@@ -26,6 +26,11 @@
 #define BACKGROUND_SCENE_HEIGHT  SCREEN_HEIGHT
 #define BACKGROUND_SCENE_COUNT  5
 #define BACKGROUND_WORLD_HEIGHT  (BACKGROUND_SCENE_COUNT * BACKGROUND_SCENE_HEIGHT)
+#define CLOUD_COUNT  9
+#define CLOUD_WORLD_HEIGHT  (BACKGROUND_WORLD_HEIGHT / 2)
+#define CLOUD_SCROLL_SPEED_MULTIPLIER  2
+#define CLOUD_TEXTURE_FIRST  20
+#define CLOUD_DRAW_SCALE  0.5
 #define JUNGLE_BACKGROUND_TEXTURE_1  5
 #define JUNGLE_BACKGROUND_TEXTURE_2  13
 #define JUNGLE_BACKGROUND_TEXTURE_3  14
@@ -102,6 +107,14 @@ struct shooter_coin
     int active;
 };
 
+struct shooter_cloud
+{
+    int x;
+    int world_y;
+    int width;
+    int height;
+};
+
 struct shooter_debris
 {
     int x_subpixels;
@@ -148,6 +161,19 @@ shooter_enemy_type[ ENEMY_TYPE_COUNT ] shooter_enemy_types =
 {
     { 3, 113, 150, 1, 1 },
     { 17, 148, 132, 5, 2 }
+};
+
+shooter_cloud[ CLOUD_COUNT ] shooter_clouds =
+{
+    { 145, 50, 384, 256 },
+    { 495, 150, 384, 251 },
+    { 300, 250, 374, 256 },
+    { 155, 350, 384, 256 },
+    { 500, 450, 384, 255 },
+    { 315, 550, 372, 256 },
+    { 140, 650, 384, 256 },
+    { 500, 750, 384, 256 },
+    { 320, 850, 384, 256 }
 };
 
 int shooter_random( int limit )
@@ -790,6 +816,33 @@ void shooter_draw_background( int background_scroll )
     }
 }
 
+void shooter_draw_cloud_layer( int background_scroll )
+{
+    int cloud_scroll =
+        background_scroll * CLOUD_SCROLL_SPEED_MULTIPLIER;
+    set_drawing_scale( CLOUD_DRAW_SCALE, CLOUD_DRAW_SCALE );
+    set_multiply_color( color_white );
+
+    for( int slot = 0; slot < CLOUD_COUNT; ++slot )
+    {
+        shooter_cloud* cloud = &shooter_clouds[ slot ];
+        int cloud_y =
+            (cloud->world_y + cloud_scroll) % CLOUD_WORLD_HEIGHT;
+        select_texture( CLOUD_TEXTURE_FIRST + slot );
+        select_region( 0 );
+        define_region_center( 0, 0, cloud->width, cloud->height );
+        draw_region_zoomed_at( cloud->x, cloud_y );
+
+        if( cloud_y > CLOUD_WORLD_HEIGHT - cloud->height / 4 )
+          draw_region_zoomed_at(
+              cloud->x,
+              cloud_y - CLOUD_WORLD_HEIGHT
+          );
+    }
+
+    set_drawing_scale( 1, 1 );
+}
+
 void shooter_draw()
 {
     int coin_frame =
@@ -969,6 +1022,8 @@ void shooter_draw()
         PLAYER_Y_OFFSET_PIXELS
     );
     set_drawing_scale( 1, 1 );
+
+    shooter_draw_cloud_layer( background_scroll );
 
     select_texture( 11 );
     define_region_center(

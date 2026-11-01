@@ -21,6 +21,8 @@ A small Vircon32 top-down shooter called Shooty McShoots.
   based on `images\newExplosion.png`.
 - Enemy ships break into metal-and-hull debris that scatters, then settles and
   scrolls with the jungle ground.
+- Nine semi-transparent cloud sprites form a foreground layer that scrolls at
+  half the jungle background speed, over the ground and ships.
 - Select **PLAY** with **Enter** or any face button at the title screen. After
   the game-over screen's two-second lockout, press any button to return to the
   title screen.

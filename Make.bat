@@ -48,6 +48,24 @@ png2vircon images\explosion-frames.png -o obj\explosion.vtex
 if errorlevel 1 goto failed
 png2vircon images\coin-spin.png -o obj\coin.vtex
 if errorlevel 1 goto failed
+png2vircon images\cloud-01.png -o obj\cloud-01.vtex
+if errorlevel 1 goto failed
+png2vircon images\cloud-02.png -o obj\cloud-02.vtex
+if errorlevel 1 goto failed
+png2vircon images\cloud-03.png -o obj\cloud-03.vtex
+if errorlevel 1 goto failed
+png2vircon images\cloud-04.png -o obj\cloud-04.vtex
+if errorlevel 1 goto failed
+png2vircon images\cloud-05.png -o obj\cloud-05.vtex
+if errorlevel 1 goto failed
+png2vircon images\cloud-06.png -o obj\cloud-06.vtex
+if errorlevel 1 goto failed
+png2vircon images\cloud-07.png -o obj\cloud-07.vtex
+if errorlevel 1 goto failed
+png2vircon images\cloud-08.png -o obj\cloud-08.vtex
+if errorlevel 1 goto failed
+png2vircon images\cloud-09.png -o obj\cloud-09.vtex
+if errorlevel 1 goto failed
 
 echo Assemble the code
 assemble obj\main.asm -o obj\main.vbin

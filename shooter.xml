@@ -23,6 +23,15 @@
         <texture path="obj/enemy-02.vtex" />
         <texture path="obj/player-up-banking.vtex" />
         <texture path="obj/player-down-banking.vtex" />
+        <texture path="obj/cloud-01.vtex" />
+        <texture path="obj/cloud-02.vtex" />
+        <texture path="obj/cloud-03.vtex" />
+        <texture path="obj/cloud-04.vtex" />
+        <texture path="obj/cloud-05.vtex" />
+        <texture path="obj/cloud-06.vtex" />
+        <texture path="obj/cloud-07.vtex" />
+        <texture path="obj/cloud-08.vtex" />
+        <texture path="obj/cloud-09.vtex" />
     </textures>
     <sounds />
 </rom-definition>

@@ -6,7 +6,7 @@
         <texture path="obj/player.vtex" />
         <texture path="obj/player-bank-left.vtex" />
         <texture path="obj/player-bank-right.vtex" />
-        <texture path="obj/enemy-alien.vtex" />
+        <texture path="obj/enemy-01.vtex" />
         <texture path="obj/title.vtex" />
         <texture path="obj/jungle-background.vtex" />
         <texture path="obj/health-segment.vtex" />

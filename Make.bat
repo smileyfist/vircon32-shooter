@@ -14,9 +14,9 @@ png2vircon images\player-bank-left.png -o obj\player-bank-left.vtex
 if errorlevel 1 goto failed
 png2vircon images\player-bank-right.png -o obj\player-bank-right.vtex
 if errorlevel 1 goto failed
-png2vircon images\enemy-alien.png -o obj\enemy-alien.vtex
+png2vircon images\enemy-01.png -o obj\enemy-01.vtex
 if errorlevel 1 goto failed
-png2vircon images\enemy-debris.png -o obj\enemy-debris.vtex
+png2vircon images\enemy-01-debri.png -o obj\enemy-debris.vtex
 if errorlevel 1 goto failed
 png2vircon images\title-screen.png -o obj\title.vtex
 if errorlevel 1 goto failed
@@ -38,7 +38,7 @@ png2vircon images\laser-blast.png -o obj\laser-blast.vtex
 if errorlevel 1 goto failed
 png2vircon images\game-over-screen.png -o obj\game-over-screen.vtex
 if errorlevel 1 goto failed
-png2vircon images\explosion.png -o obj\explosion.vtex
+png2vircon images\explosion-frames.png -o obj\explosion.vtex
 if errorlevel 1 goto failed
 png2vircon images\coin.png -o obj\coin.vtex
 if errorlevel 1 goto failed

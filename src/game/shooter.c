@@ -10,8 +10,9 @@
 #define MAX_EXPLOSIONS  12
 #define MAX_COINS  8
 #define MAX_DEBRIS  240
-#define DEBRIS_PIECE_COUNT  12
-#define DEBRIS_CELL_SIZE  32
+#define DEBRIS_PIECE_COUNT  10
+#define DEBRIS_CELL_SIZE  48
+#define DEBRIS_ATLAS_COLUMNS  5
 #define DEBRIS_BURST_DURATION  24
 #define DEBRIS_RENDER_HALF_SIZE  5
 #define MAX_HEALTH  20
@@ -31,7 +32,8 @@
 #define ENEMY_MOVE_INTERVAL  PLAYER_MOVE_INTERVAL
 #define PLAYER_SPRITE_SIZE  128
 #define BANKED_SPRITE_SIZE  160
-#define ENEMY_SPRITE_SIZE  128
+#define ENEMY_SPRITE_WIDTH  113
+#define ENEMY_SPRITE_HEIGHT  150
 #define ENEMY_Y_STEP_PIXELS  PLAYER_Y_STEP_PIXELS
 #define ENEMY_DRAW_SIZE_PIXELS  38
 #define ENEMY_HITBOX_HALF_SIZE  16
@@ -42,8 +44,8 @@
 #define LASER_SPRITE_HEIGHT  46
 #define LASER_HITBOX_HALF_WIDTH  3
 #define LASER_HITBOX_HALF_HEIGHT  6
-#define EXPLOSION_FRAME_SIZE  32
-#define EXPLOSION_FRAME_COUNT  4
+#define EXPLOSION_FRAME_SIZE  64
+#define EXPLOSION_FRAME_COUNT  5
 #define EXPLOSION_FRAME_DURATION  3
 #define PLAYER_HITBOX_HALF_WIDTH  14
 #define PLAYER_HITBOX_HALF_HEIGHT  20
@@ -196,13 +198,15 @@ void shooter_spawn_debris( int x, int y )
           base_velocity_x = -32;
 
         int speed = 12 + shooter_random( 9 );
-        int column = piece % 4;
-        int row = piece / 4;
+        int column = piece % DEBRIS_ATLAS_COLUMNS;
+        int row = piece / DEBRIS_ATLAS_COLUMNS;
         shooter_debris* debris = &game.debris[ debris_slot ];
         debris->x_subpixels = x * 16 +
-            (column * DEBRIS_CELL_SIZE + DEBRIS_CELL_SIZE / 2 - 64) * 48 / 10;
+            (column * DEBRIS_CELL_SIZE + DEBRIS_CELL_SIZE / 2 -
+             DEBRIS_ATLAS_COLUMNS * DEBRIS_CELL_SIZE / 2) * 48 / 10;
         debris->y_subpixels = y * 16 +
-            (24 + row * DEBRIS_CELL_SIZE + DEBRIS_CELL_SIZE / 2 - 64) *
+            (row * DEBRIS_CELL_SIZE + DEBRIS_CELL_SIZE / 2 -
+             2 * DEBRIS_CELL_SIZE / 2) *
               48 / 10;
         debris->velocity_x = base_velocity_x * speed / 16;
         debris->velocity_y = base_velocity_y * speed / 16;
@@ -717,9 +721,9 @@ void shooter_draw()
         if( debris->active )
         {
             int region_x =
-                (debris->piece % 4) * DEBRIS_CELL_SIZE;
+                (debris->piece % DEBRIS_ATLAS_COLUMNS) * DEBRIS_CELL_SIZE;
             int region_y =
-                (debris->piece / 4) * DEBRIS_CELL_SIZE;
+                (debris->piece / DEBRIS_ATLAS_COLUMNS) * DEBRIS_CELL_SIZE;
             define_region_center(
                 region_x,
                 region_y,
@@ -764,7 +768,12 @@ void shooter_draw()
 
     select_texture( 3 );
     select_region( 0 );
-    define_region_center( 0, 0, ENEMY_SPRITE_SIZE, ENEMY_SPRITE_SIZE );
+    define_region_center(
+        0,
+        0,
+        ENEMY_SPRITE_WIDTH,
+        ENEMY_SPRITE_HEIGHT
+    );
     set_drawing_scale( 0.3, 0.3 );
     set_multiply_color( color_white );
 
@@ -780,7 +789,7 @@ void shooter_draw()
 
     select_texture( 10 );
     select_region( 0 );
-    set_drawing_scale( 1, 1 );
+    set_drawing_scale( 0.5, 0.5 );
     set_multiply_color( color_white );
     for( int slot = 0; slot < MAX_EXPLOSIONS; ++slot )
     {
@@ -798,6 +807,7 @@ void shooter_draw()
             draw_region_zoomed_at( explosion->x, explosion->y );
         }
     }
+    set_drawing_scale( 1, 1 );
 
     select_texture( 11 );
     select_region( 0 );

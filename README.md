@@ -16,7 +16,8 @@ A small Vircon32 top-down shooter called Shooty McShoots.
   into it; your coin total appears at the bottom-left of the playfield.
 - Remaining hull is shown as a vertical, bright-green segmented bar on the
   far right over a black backing, with up to 20 segments.
-- Enemy ships burst into a brief pixel-art explosion when hit.
+- Enemy ships burst into a brief five-frame pixel-art explosion when hit,
+  based on `images\newExplosion.png`.
 - Enemy ships break into metal-and-hull debris that scatters, then settles and
   scrolls with the jungle ground.
 - Select **PLAY** with **Enter** or any face button at the title screen. After
@@ -28,8 +29,9 @@ sprites raise one wing and lower the other while keeping the nose pointed up.
 The title screen is a 640 x 360 center crop of `images\newerTitle.png`, saved
 as `images\title-screen.png` for the console's texture-size limit. The
 game-over screen uses `images\game-over-screen.png`.
-Enemies use a red, swept-wing alien ship with
-metal armor panels and a blue canopy. The game scrolls through five aerial
+Enemies use `images\enemy-01.png`, split from the enemy sprite sheet. Enemy
+destruction scatters ten fragments from `images\enemy-01-debri.png`, with
+five fragments charred black. The game scrolls through five aerial
 jungle scenes in `images\jungle-background.png` and
 `images\jungle-background-2.png` through `-5.png` as consecutive sections,
 without runtime crossfades. Their edges are adjusted to meet seamlessly,

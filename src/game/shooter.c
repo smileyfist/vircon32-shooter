@@ -9,6 +9,10 @@
 #define MAX_ENEMIES  5
 #define MAX_EXPLOSIONS  12
 #define MAX_COINS  8
+#define MAX_DEBRIS  120
+#define DEBRIS_PIECE_COUNT  12
+#define DEBRIS_CELL_SIZE  32
+#define DEBRIS_BURST_DURATION  24
 #define MAX_HEALTH  20
 #define COIN_DROP_CHANCE  4
 #define COIN_SPRITE_SIZE  16
@@ -66,6 +70,18 @@ struct shooter_coin
     int active;
 };
 
+struct shooter_debris
+{
+    int x_subpixels;
+    int y_subpixels;
+    int velocity_x;
+    int velocity_y;
+    int age;
+    int piece;
+    int grounded;
+    int active;
+};
+
 struct shooter_game
 {
     int player_x;
@@ -78,7 +94,7 @@ struct shooter_game
     int frame;
     int score;
     int coins_collected;
-    int coin_random;
+    int random_seed;
     int health;
     int wave;
     int wave_total;
@@ -89,9 +105,17 @@ struct shooter_game
     shooter_enemy[ MAX_ENEMIES ] enemies;
     shooter_explosion[ MAX_EXPLOSIONS ] explosions;
     shooter_coin[ MAX_COINS ] coins;
+    shooter_debris[ MAX_DEBRIS ] debris;
 };
 
 shooter_game game;
+
+int shooter_random( int limit )
+{
+    game.random_seed =
+        (game.random_seed * 25173 + 13849) % 65521;
+    return game.random_seed % limit;
+}
 
 void shooter_spawn_explosion( int x, int y )
 {
@@ -109,11 +133,89 @@ void shooter_spawn_explosion( int x, int y )
     }
 }
 
+void shooter_spawn_debris( int x, int y )
+{
+    int direction_offset = shooter_random( 8 );
+
+    for( int piece = 0; piece < DEBRIS_PIECE_COUNT; ++piece )
+    {
+        int debris_slot = -1;
+        int oldest_grounded_slot = -1;
+        int oldest_grounded_age = -1;
+
+        for( int slot = 0; slot < MAX_DEBRIS; ++slot )
+        {
+            shooter_debris* debris = &game.debris[ slot ];
+            if( !debris->active )
+            {
+                debris_slot = slot;
+                break;
+            }
+            if( debris->grounded && debris->age > oldest_grounded_age )
+            {
+                oldest_grounded_slot = slot;
+                oldest_grounded_age = debris->age;
+            }
+        }
+
+        if( debris_slot < 0 )
+          debris_slot = oldest_grounded_slot;
+        if( debris_slot < 0 )
+          continue;
+
+        int direction = (piece + direction_offset) % 8;
+        int base_velocity_x = 0;
+        int base_velocity_y = 0;
+        if( direction == 0 )
+        {
+            base_velocity_x = -24;
+            base_velocity_y = -24;
+        }
+        else if( direction == 1 )
+          base_velocity_y = -32;
+        else if( direction == 2 )
+        {
+            base_velocity_x = 24;
+            base_velocity_y = -24;
+        }
+        else if( direction == 3 )
+          base_velocity_x = 32;
+        else if( direction == 4 )
+        {
+            base_velocity_x = 24;
+            base_velocity_y = 24;
+        }
+        else if( direction == 5 )
+          base_velocity_y = 32;
+        else if( direction == 6 )
+        {
+            base_velocity_x = -24;
+            base_velocity_y = 24;
+        }
+        else
+          base_velocity_x = -32;
+
+        int speed = 12 + shooter_random( 9 );
+        int column = piece % 4;
+        int row = piece / 4;
+        shooter_debris* debris = &game.debris[ debris_slot ];
+        debris->x_subpixels = x * 16 +
+            (column * DEBRIS_CELL_SIZE + DEBRIS_CELL_SIZE / 2 - 64) * 48 / 10;
+        debris->y_subpixels = y * 16 +
+            (24 + row * DEBRIS_CELL_SIZE + DEBRIS_CELL_SIZE / 2 - 64) *
+              48 / 10;
+        debris->velocity_x = base_velocity_x * speed / 16;
+        debris->velocity_y = base_velocity_y * speed / 16;
+        debris->age = 0;
+        debris->piece = piece;
+        debris->grounded = false;
+        debris->active = true;
+    }
+}
+
 void shooter_maybe_drop_coin( int x, int y )
 {
-    game.coin_random =
-        (game.coin_random * 25173 + 13849) % 65521;
-    if( game.coin_random % COIN_DROP_CHANCE != 0 )
+    if( shooter_random( COIN_DROP_CHANCE ) != 0 )
       return;
 
     for( int slot = 0; slot < MAX_COINS; ++slot )
@@ -189,7 +291,7 @@ void shooter_start()
     game.frame = 0;
     game.score = 0;
     game.coins_collected = 0;
-    game.coin_random = 1;
+    game.random_seed = 1;
     game.health = MAX_HEALTH;
     game.wave = 0;
     game.game_over = false;
@@ -200,6 +302,8 @@ void shooter_start()
       game.explosions[ slot ].active = false;
     for( int slot = 0; slot < MAX_COINS; ++slot )
       game.coins[ slot ].active = false;
+    for( int slot = 0; slot < MAX_DEBRIS; ++slot )
+      game.debris[ slot ].active = false;
 
     shooter_begin_wave();
 }
@@ -336,6 +440,42 @@ void shooter_update_coins()
     }
 }
 
+void shooter_update_debris()
+{
+    for( int slot = 0; slot < MAX_DEBRIS; ++slot )
+    {
+        shooter_debris* debris = &game.debris[ slot ];
+        if( !debris->active )
+          continue;
+
+        if( !debris->grounded )
+        {
+            debris->x_subpixels += debris->velocity_x;
+            debris->y_subpixels += debris->velocity_y;
+            debris->velocity_y += 2;
+            ++debris->age;
+
+            if( debris->age >= DEBRIS_BURST_DURATION )
+            {
+                debris->grounded = true;
+                debris->velocity_x = 0;
+                debris->velocity_y = 0;
+            }
+        }
+        else
+        {
+            ++debris->age;
+            if( (game.frame + 1) % BACKGROUND_SCROLL_INTERVAL == 0 )
+              debris->y_subpixels += 16;
+        }
+
+        if( debris->x_subpixels < -32 * 16 ||
+            debris->x_subpixels > (SCREEN_WIDTH + 32) * 16 ||
+            debris->y_subpixels > (SCREEN_HEIGHT + 32) * 16 )
+          debris->active = false;
+    }
+}
+
 void shooter_update_bullets()
 {
     for( int bullet_slot = 0; bullet_slot < MAX_BULLETS; ++bullet_slot )
@@ -381,6 +521,7 @@ void shooter_update_bullets()
                   enemy_y - ENEMY_HITBOX_HALF_SIZE )
             {
                 shooter_spawn_explosion( enemy_x, enemy_y );
+                shooter_spawn_debris( enemy_x, enemy_y );
                 shooter_maybe_drop_coin( enemy->x, enemy->y );
                 enemy->active = false;
                 bullet->active = false;
@@ -425,6 +566,7 @@ void shooter_check_player_collisions()
             ) )
         {
             shooter_spawn_explosion( enemy_x, enemy_y );
+            shooter_spawn_debris( enemy_x, enemy_y );
 
             if( game.invulnerability == 0 )
             {
@@ -500,6 +642,7 @@ void shooter_update()
     }
 
     shooter_check_player_collisions();
+    shooter_update_debris();
 
     ++game.frame;
 }
@@ -519,6 +662,32 @@ void shooter_draw()
         SCREEN_WIDTH / 2,
         SCREEN_HEIGHT / 2 + background_scroll - SCREEN_HEIGHT
     );
+
+    select_texture( 12 );
+    set_drawing_scale( 0.3, 0.3 );
+    set_multiply_color( color_white );
+    for( int slot = 0; slot < MAX_DEBRIS; ++slot )
+    {
+        shooter_debris* debris = &game.debris[ slot ];
+        if( debris->active )
+        {
+            int region_x =
+                (debris->piece % 4) * DEBRIS_CELL_SIZE;
+            int region_y =
+                (debris->piece / 4) * DEBRIS_CELL_SIZE;
+            define_region_center(
+                region_x,
+                region_y,
+                region_x + DEBRIS_CELL_SIZE,
+                region_y + DEBRIS_CELL_SIZE
+            );
+            draw_region_zoomed_at(
+                debris->x_subpixels / 16,
+                debris->y_subpixels / 16
+            );
+        }
+    }
+    set_drawing_scale( 1, 1 );
 
     select_texture( 7 );
     select_region( 0 );

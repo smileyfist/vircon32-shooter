@@ -15,6 +15,7 @@
         <texture path="obj/game-over-screen.vtex" />
         <texture path="obj/explosion.vtex" />
         <texture path="obj/coin.vtex" />
+        <texture path="obj/enemy-debris.vtex" />
     </textures>
     <sounds />
 </rom-definition>

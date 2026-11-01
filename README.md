@@ -17,6 +17,8 @@ A small Vircon32 top-down shooter called Shooty McShoots.
 - Remaining hull is shown as a vertical, bright-green segmented bar on the
   far right over a black backing, with up to 20 segments.
 - Enemy ships burst into a brief pixel-art explosion when hit.
+- Enemy ships break into metal-and-hull debris that scatters, then settles and
+  scrolls with the jungle ground.
 - Select **PLAY** with **Enter** or any face button at the title screen. After
   the game-over screen's two-second lockout, press any button to return to the
   title screen.
@@ -24,9 +26,9 @@ A small Vircon32 top-down shooter called Shooty McShoots.
 The player uses the transparent sprite in `images\player.png`; separate banked
 sprites raise one wing and lower the other while keeping the nose pointed up.
 The 640 x 360 title and game-over screens use `images\title.png` and
-`images\game-over-screen.png`. Enemies use a red, swept-wing alien ship with a
-blue canopy. The game uses a slowly scrolling, vertically repeating aerial
-jungle tile in `images\jungle-background.png`.
+`images\game-over-screen.png`. Enemies use a red, swept-wing alien ship with
+metal armor panels and a blue canopy. The game uses a slowly scrolling,
+vertically repeating aerial jungle tile in `images\jungle-background.png`.
 
 ## Source layout
 
@@ -38,10 +40,10 @@ with separate `game`, `states`, and `utils` folders:
 - `src/game/` contains the arena, player, enemy, and projectile logic.
 - `src/states/` contains the title and game-over screens.
 - `src/utils/` contains shared constants and drawing helpers.
-- `images/` contains the player and banked sprites, enemy ship, title and
-  game-over screens, health-bar graphics, laser, explosion animation, coin,
-  and jungle game background. All game images are converted to Vircon32
-  textures during the build.
+- `images/` contains the player and banked sprites, enemy ship and debris,
+  title and game-over screens, health-bar graphics, laser, explosion
+  animation, coin, and jungle game background. All game images are converted
+  to Vircon32 textures during the build.
 
 Vircon32's C compiler accepts one source file per invocation, so `src/main.c`
 includes the module `.c` files to build them together as one program.
